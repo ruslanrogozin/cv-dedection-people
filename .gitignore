@@ -1,5 +1,5 @@
 /venv
-
+model/
 /new_data
-
+data/
 *__pycache__
