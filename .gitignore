@@ -1,6 +1,5 @@
 /venv
-test/
+
 /new_data
 
 *__pycache__
-*model
