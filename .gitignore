@@ -1,0 +1,5 @@
+/venv
+*data
+/new_data
+scripts\__pycache__
+*model
