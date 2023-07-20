@@ -21,7 +21,8 @@ if __name__ == "__main__":
     backbone = ResNet()
 
     url = 'https://api.ngc.nvidia.com/v2/models/nvidia/ssd_pyt_ckpt_amp/versions/20.06.0/files/nvidia_ssdpyt_amp_200703.pt'
-    print(os.path.exists('ssd/nvidia_ssdpyt_amp_200703.pt'))
+    
+
     nvidia_ssd(True)
    
     
