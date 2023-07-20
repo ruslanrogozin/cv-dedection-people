@@ -20,10 +20,8 @@ if __name__ == "__main__":
     IMAGE_SIZE = (300, 300)
     backbone = ResNet()
 
-    url = 'https://api.ngc.nvidia.com/v2/models/nvidia/ssd_pyt_ckpt_amp/versions/20.06.0/files/nvidia_ssdpyt_amp_200703.pt'
-    
+    model = nvidia_ssd()
 
-    nvidia_ssd(True)
    
     
     
