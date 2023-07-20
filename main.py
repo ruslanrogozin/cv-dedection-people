@@ -4,10 +4,11 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 from torchsummary import summary
-
+import os
 
 
 from ssd.model import ResNet
+from ssd.entrypoints import _download_checkpoint
 
 def main():
     return 0
@@ -16,10 +17,16 @@ def main():
 
 
 if __name__ == "__main__":
-    print(1)
     IMAGE_SIZE = (300, 300)
     backbone = ResNet()
 
-    print(summary(backbone, (3, *IMAGE_SIZE)))
+    url = 'https://api.ngc.nvidia.com/v2/models/nvidia/ssd_pyt_ckpt_amp/versions/20.06.0/files/nvidia_ssdpyt_amp_200703.pt'
+    print(os.path.exists('ssd/nvidia_ssdpyt_amp_200703.pt'))
+    #_download_checkpoint(url)
+   
+    
+    
+    
+    
     
     #main()
