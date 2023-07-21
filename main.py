@@ -44,21 +44,11 @@ def main():
 
         name, format = data.files[i].name.rsplit('.', 1)
         
-        
-   
-        
         with torch.no_grad():
             detections = model(image)
-        results_per_input = processing.decode_results(detections,criteria=0.5, max_output=20)
+        results_per_input = processing.decode_results(detections,criteria=0.8, max_output=20)
         convert_and_save(results_per_input, data.files[i], name, format, threshold=0.5)
-        #bboxes, classes, confidences = results_per_input[0]
-        #n = cv2.imread(str(images[0])) 
-        #cv2.imshow('image', n)
-        #cv2.waitKey(0)
-        #cv2.imshow('asd', 'data/cat1.jpg')
-        
- 
-        
+
 
 
 if __name__ == "__main__":
