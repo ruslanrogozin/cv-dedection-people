@@ -4,4 +4,4 @@
 2. create virtual environment python -m venv .venv (i use python 3.9.0)
 3. activate venv
 4. install requirements.txt
-5. run main.py
+5. put images in folder 'data' and run main.py
