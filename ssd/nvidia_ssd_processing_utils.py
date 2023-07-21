@@ -69,7 +69,7 @@ class Processing:
             return img#, original_shape
 
         @staticmethod
-        def decode_results(predictions):
+        def decode_results(predictions, criteria=0.5, max_output=20):
             dboxes = dboxes300_coco()
             encoder = Encoder(dboxes)
             ploc, plabel = [val.float() for val in predictions]

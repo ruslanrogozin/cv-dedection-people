@@ -27,7 +27,7 @@ def main():
     images.extend(png)
     images.sort()
     data = ImagesDataset(images)
-    print(data.files)
+ 
 
     if not images:
         sys.exit('Data directory is empty')
@@ -49,7 +49,7 @@ def main():
         
         with torch.no_grad():
             detections = model(image)
-        results_per_input = processing.decode_results(detections)
+        results_per_input = processing.decode_results(detections,criteria=0.5, max_output=20)
         convert_and_save(results_per_input, data.files[i], name, format, threshold=0.5)
         #bboxes, classes, confidences = results_per_input[0]
         #n = cv2.imread(str(images[0])) 

@@ -13,6 +13,7 @@ def convert_and_save(prediction, original_image, name, format_data,  threshold=0
 
     
     orig_h, orig_w = original.shape[0], original.shape[1]
+
     for idx in range(len(bboxes)):
         if classes[idx] == 1:
             # get the bounding box coordinates in xyxy format
