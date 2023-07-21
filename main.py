@@ -1,66 +1,68 @@
 import sys
 from pathlib import Path
-import cv2
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchsummary import summary
 import os
+import cv2
 
 
 from ssd.model import ResNet
+from ssd.convert_and_save import convert_and_save
 from ssd.entrypoints import _download_checkpoint, nvidia_ssd
 from ssd.nvidia_ssd_processing_utils import Processing as processing
+from  ssd.dataloader import ImagesDataset
 
 
 def main():
-    return 0
+    IMAGE_DIR = Path('data')
+    jpg = list(IMAGE_DIR.rglob('*.jpg'))
+    jpeg = list(IMAGE_DIR.rglob('*.jpeg'))
+    png = list(IMAGE_DIR.rglob('*.png'))
+
+    images = []
+    images.extend(jpg)
+    images.extend(jpeg)
+    images.extend(png)
+    images.sort()
+    data = ImagesDataset(images)
+    print(data.files)
+
+    if not images:
+        sys.exit('Data directory is empty')
+    
+    model = nvidia_ssd() 
+    model.eval()
+    
+    if not (Path.cwd() / 'new_data').exists():
+        Path("new_data").mkdir(parents=True, exist_ok=True)
+    print(images[0])  
+    n= cv2.imread(str(images[0])) 
+   
+    for i, image in tqdm(enumerate(data), ncols=80):
+
+        name, format = data.files[i].name.rsplit('.', 1)
+        
+        
+   
+        
+        with torch.no_grad():
+            detections = model(image)
+        results_per_input = processing.decode_results(detections)
+        convert_and_save(results_per_input, data.files[i], name, format)
+        #bboxes, classes, confidences = results_per_input[0]
+        #n = cv2.imread(str(images[0])) 
+        #cv2.imshow('image', n)
+        #cv2.waitKey(0)
+        #cv2.imshow('asd', 'data/cat1.jpg')
+        break
  
         
 
 
 if __name__ == "__main__":
-    IMAGE_SIZE = (300, 300)
-    backbone = ResNet()
-    model = nvidia_ssd() 
-    model.eval()
-    uris = [
-    'http://images.cocodataset.org/val2017/000000397133.jpg',
-    'http://images.cocodataset.org/val2017/000000037777.jpg',
-    'http://images.cocodataset.org/val2017/000000252219.jpg'
-     ]
-    inputs = [processing.prepare_input(uri) for uri in uris]
-    #precision = 'fp32'
-    tensor = processing.prepare_tensor(inputs)
-    with torch.no_grad():
-        detections_batch = model(tensor)
-    results_per_input = processing.decode_results(detections_batch)
-    best_results_per_input = [processing.pick_best(results, 0.40) for results in results_per_input]
-    
-    bboxes, classes, confidences = best_results_per_input[2]
-    
-    image = inputs[2].copy()
-    orig_h, orig_w = image.shape[0], image.shape[1]
-    print(classes, bboxes)
-    for idx in range(len(bboxes)):
-        if classes[idx] == 1:
-            # get the bounding box coordinates in xyxy format
-            x1, y1, x2, y2 = bboxes[idx]
-            # resize the bounding boxes from the normalized to 300 pixels
-            x1, y1 = int(x1*300), int(y1*300)
-            x2, y2 = int(x2*300), int(y2*300)
-            # resizing again to match the original dimensions of the image
-            x1, y1 = int((x1/300)*orig_w), int((y1/300)*orig_h)
-            x2, y2 = int((x2/300)*orig_w), int((y2/300)*orig_h)
-            # draw the bounding boxes around the objects
-            cv2.rectangle(
-                image, (x1, y1), (x2, y2), (0, 0, 255), 2, cv2.LINE_AA
-            )
+    main()
     
     
-    
-    cv2.imshow('image', image)
-    cv2.imwrite()
-    cv2.waitKey(0)
-    
-    
-    #main()
+   

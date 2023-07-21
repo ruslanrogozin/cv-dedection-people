@@ -46,6 +46,9 @@ class Processing:
         @staticmethod
         def prepare_tensor(inputs, fp16=False):
             NHWC = np.array(inputs)
+            if len(NHWC.shape) < 4:
+                NHWC = np.expand_dims(NHWC,0)
+                
             NCHW = np.swapaxes(np.swapaxes(NHWC, 1, 3), 2, 3)
             tensor = torch.from_numpy(NCHW)
             tensor = tensor.contiguous()
@@ -59,10 +62,11 @@ class Processing:
         @staticmethod
         def prepare_input(img_uri):
             img = Processing.load_image(img_uri)
+            #original_shape = img.shape
             img = Processing.rescale(img, 300, 300)
             img = Processing.crop_center(img, 300, 300)
             img = Processing.normalize(img)
-            return img
+            return img#, original_shape
 
         @staticmethod
         def decode_results(predictions):
