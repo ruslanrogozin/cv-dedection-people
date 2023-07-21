@@ -19,13 +19,7 @@ def main():
 if __name__ == "__main__":
     IMAGE_SIZE = (300, 300)
     backbone = ResNet()
-    
-    model = nvidia_ssd()
-
-   
-    
-    
-    
+    model = nvidia_ssd() 
     
     
     #main()
