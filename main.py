@@ -37,8 +37,8 @@ def main():
     
     if not (Path.cwd() / 'new_data').exists():
         Path("new_data").mkdir(parents=True, exist_ok=True)
-    print(images[0])  
-    n= cv2.imread(str(images[0])) 
+   
+ 
    
     for i, image in tqdm(enumerate(data), ncols=80):
 
@@ -50,13 +50,13 @@ def main():
         with torch.no_grad():
             detections = model(image)
         results_per_input = processing.decode_results(detections)
-        convert_and_save(results_per_input, data.files[i], name, format)
+        convert_and_save(results_per_input, data.files[i], name, format, threshold=0.5)
         #bboxes, classes, confidences = results_per_input[0]
         #n = cv2.imread(str(images[0])) 
         #cv2.imshow('image', n)
         #cv2.waitKey(0)
         #cv2.imshow('asd', 'data/cat1.jpg')
-        break
+        
  
         
 
