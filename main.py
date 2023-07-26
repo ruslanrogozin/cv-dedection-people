@@ -3,15 +3,12 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 import torch
-import torch.nn as nn
 
 
-from ssd.model import ResNet
 from ssd.convert_and_save import convert_and_save
-from ssd.entrypoints import _download_checkpoint, nvidia_ssd
+from ssd.entrypoints import nvidia_ssd
 from ssd.nvidia_ssd_processing_utils import Processing as processing
 from ssd.dataloader import ImagesDataset
-
 
 
 def main():
@@ -47,7 +44,7 @@ def main():
     if not (Path.cwd() / "new_data").exists():
         Path("new_data").mkdir(parents=True, exist_ok=True)
 
-    for i, image in tqdm(enumerate(data), ncols=80):
+    for i, image in tqdm(enumerate(data), ncols=20):
         # Вызвать prepare tensor nwhc
         # в даталоадер. path.stem path.suffix. В одно название
         name, format = data.files[i].name.rsplit(".", 1)
