@@ -11,29 +11,20 @@ from ssd.convert_and_save import convert_and_save
 from ssd.entrypoints import nvidia_ssd
 from ssd.nvidia_ssd_processing_utils import Processing as processing
 from ssd.dataloader import ImagesDataset
-#from utils.utils import Normalize
 
 
 def main():
 
-    #import os
-    #print(os.getcwd())
-    #print(__file__)
+    # import os
+    # print(os.getcwd())
+    # print(__file__)
     p = Path(__file__)
     print(p.parents[0], p.parents[1])
     print(p.parents[0] / 'data')
 
-
-    data = ImagesDataset(path = 'data',
-                         transform = 'DEFAULT')
+    data = ImagesDataset(path='data',
+                         transform='DEFAULT')
     import os
-
-    #print(os.path.basename(data.images[0]))
-    #print(os.path.splitext(data.images[0]))
-
-
-    #sys.exit("aaaaaaaaaaaaaaaaaaaaaaaa")
-    #sys.exit("aaaaaaaaaaaaaaaaaaaaaaaa")
 
     # добавить выбор device cpu/cuda
     # какие веса используются передать
@@ -42,7 +33,7 @@ def main():
 
     # Path.cwd() / 'new_data' == Path('new_data')
     # Зафикисровать путь от файла и вынести в конфиги / убрать проверку
-    #$if not (Path.cwd() / "new_data").exists():
+    # $if not (Path.cwd() / "new_data").exists():
     Path("new_data").mkdir(parents=True, exist_ok=True)
 
     for i, image in tqdm(enumerate(data), ncols=20):
