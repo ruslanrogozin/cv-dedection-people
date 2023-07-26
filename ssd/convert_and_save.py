@@ -4,14 +4,24 @@ import torchvision.transforms.functional as F
 from ssd.nvidia_ssd_processing_utils import Processing as processing
 import cv2
 
+
 def convert_and_save(prediction, original_image, name, format_data,  threshold=0.5, path='new_data/'):
-    ''' function for convetr and save pictures'''
-    original = cv2.imread(str(original_image)) 
+    """_summary_
+
+    Args:
+        prediction (_type_): _description_
+        original_image (_type_): _description_
+        name (_type_): _description_
+        format_data (_type_): _description_
+        threshold (float, optional): _description_. Defaults to 0.5.
+        path (str, optional): _description_. Defaults to 'new_data/'.
+    """
+
+    original = cv2.imread(str(original_image))
 
     best_results_per_input = processing.pick_best(prediction[0], threshold)
     bboxes, classes, confidences = best_results_per_input
 
-    
     orig_h, orig_w = original.shape[0], original.shape[1]
 
     for idx in range(len(bboxes)):
@@ -28,7 +38,7 @@ def convert_and_save(prediction, original_image, name, format_data,  threshold=0
             cv2.rectangle(
                 original, (x1, y1), (x2, y2), (0, 0, 255), 2, cv2.LINE_AA
             )
-            
-    #cv2.imshow('image', original)
-    #cv2.waitKey(0)
+
+    # cv2.imshow('image', original)
+    # cv2.waitKey(0)
     cv2.imwrite(path + 'new_' + name + '.' + format_data, original)
