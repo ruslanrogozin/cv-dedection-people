@@ -12,13 +12,13 @@ class ImagesDataset(Dataset):
     def __init__(self, files):
         super().__init__()
         self.files = sorted(files)
-        
+
     def __len__(self):
         return self._len
 
     def __getitem__(self, index):
-        ''' return torch.tensor(image) and shape original image'''
+        """return torch.tensor(image) and shape original image"""
         file = self.files[index]
-        inputs = processing.prepare_input(file) #HWC 
+        inputs = processing.prepare_input(file)  # HWC
         tensor = processing.prepare_tensor(inputs)
-        return tensor 
+        return tensor
