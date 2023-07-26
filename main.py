@@ -5,9 +5,9 @@ import torch
 import torch.nn as nn
 from torchsummary import summary
 import os
-import cv2
+# import cv2
 
-
+# pre-commit hooks
 from ssd.model import ResNet
 from ssd.convert_and_save import convert_and_save
 from ssd.entrypoints import _download_checkpoint, nvidia_ssd
@@ -16,7 +16,7 @@ from  ssd.dataloader import ImagesDataset
 
 
 def main():
-    IMAGE_DIR = Path('data')
+    IMAGE_DIR = Path('data')  # в файл с конфигами и там же определим текущую папку Config.image_dir
     jpg = list(IMAGE_DIR.rglob('*.jpg'))
     jpeg = list(IMAGE_DIR.rglob('*.jpeg'))
     png = list(IMAGE_DIR.rglob('*.png'))
@@ -25,31 +25,39 @@ def main():
     images.extend(jpg)
     images.extend(jpeg)
     images.extend(png)
-    images.sort()
-    data = ImagesDataset(images)
- 
+    images.sort()  # сортировка двойная
+    # torcvision.Compose(
+        #                 torcvision.rescale(),
+        #                 crop_center.norm()
+        #             )
+    # передать в image dataset
+    data = ImagesDataset(images)  # отсюда не очивидно, что происходит сортировка и трансформы
 
     if not images:
-        sys.exit('Data directory is empty')
-    
+        sys.exit('Data directory is empty')  # выше по логике
+
+    # добавить выбор device cpu/cuda
+    # какие веса используются передать
     model = nvidia_ssd() 
-    model.eval()
-    
-    if not (Path.cwd() / 'new_data').exists():
+    model.eval()  # Что происходит при переходи в режим eval.
+
+    # Path.cwd() / 'new_data' == Path('new_data')
+    if not (Path.cwd() / 'new_data').exists():  # Зафикисровать путь от файла и вынести в конфиги / убрать проверку
         Path("new_data").mkdir(parents=True, exist_ok=True)
    
- 
+
    
     for i, image in tqdm(enumerate(data), ncols=80):
-
-        name, format = data.files[i].name.rsplit('.', 1)
-        
-        with torch.no_grad():
+        # Вызвать prepare tensor nwhc
+        name, format = data.files[i].name.rsplit('.', 1)  # в даталоадер. path.stem path.suffix. В одно название
+        with torch.no_grad():  # нужен ли no grad при eval режим
+            # transform images
             detections = model(image)
-        results_per_input = processing.decode_results(detections,criteria=0.8, max_output=20)
-        convert_and_save(results_per_input, data.files[i], name, format, threshold=0.5)
-
-
+        results_per_input = processing.decode_results(detections, criteria=0.8, max_output=20)  # В конифиги
+        convert_and_save(results_per_input, data.files[i], name, format, threshold=0.5) # В конифиги
+        # добавить сигнатуру функции
+        # проверить чтобы результат на исходном изображении был
+        # Сохранять даже если ничего не нашел
 
 if __name__ == "__main__":
     main()
