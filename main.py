@@ -6,9 +6,6 @@ import torch
 import torch.nn as nn
 
 
-# import cv2
-
-# pre-commit hooks
 from ssd.model import ResNet
 from ssd.convert_and_save import convert_and_save
 from ssd.entrypoints import _download_checkpoint, nvidia_ssd
