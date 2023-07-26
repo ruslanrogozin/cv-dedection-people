@@ -13,6 +13,7 @@ from ssd.nvidia_ssd_processing_utils import Processing as processing
 from ssd.dataloader import ImagesDataset
 
 
+
 def main():
     # в файл с конфигами и там же определим текущую папку Config.image_dir
     IMAGE_DIR = Path("data")
