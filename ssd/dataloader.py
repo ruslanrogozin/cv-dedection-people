@@ -1,7 +1,10 @@
 from torch.utils.data import Dataset
 from torchvision import transforms
 from ssd.nvidia_ssd_processing_utils import Processing as processing
-
+from torchvision.datasets.folder import pil_loader
+from pathlib import Path
+import sys
+from PIL import Image
 
 class ImagesDataset(Dataset):
     """
@@ -9,16 +12,40 @@ class ImagesDataset(Dataset):
     производит скалирование и превращение в торчевые тензоры
     """
 
-    def __init__(self, files):
+    def __init__(self, path, transform = 'DEFAULT'):
         super().__init__()
-        self.files = sorted(files)
+        IMAGE_DIR = Path(path)
+        jpg = list(IMAGE_DIR.rglob("*.jpg"))
+        jpeg = list(IMAGE_DIR.rglob("*.jpeg"))
+        png = list(IMAGE_DIR.rglob("*.png"))
+        images = []
+        images.extend(jpg)
+        images.extend(jpeg)
+        images.extend(png)
+        if not images:
+            sys.exit("Data directory is empty")
+        self.images = images
+        self._len = len(self.images)
+
+        if transform == 'DEFAULT':
+            self.transform = transforms.Compose([
+                transforms.Resize(300),
+                transforms.CenterCrop(300),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
+                    #[0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+
+            # mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
+        else:
+            self.transform = transform
 
     def __len__(self):
         return self._len
 
     def __getitem__(self, index):
         """return torch.tensor(image) and shape original image"""
-        file = self.files[index]
-        inputs = processing.prepare_input(file)  # HWC
-        tensor = processing.prepare_tensor(inputs)
-        return tensor
+        file = self.images[index]
+        print(file)
+        x = Image.open(file).convert('RGB')
+        x = self.transform(x)
+        return x

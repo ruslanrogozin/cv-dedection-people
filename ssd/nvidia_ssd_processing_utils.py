@@ -19,6 +19,7 @@ class Processing:
     def rescale(img, input_height, input_width):
         """Code from Loading_Pretrained_Models.ipynb - a Caffe2 tutorial"""
         aspect = img.shape[1] / float(img.shape[0])
+
         if aspect > 1:
             # landscape orientation - wide image
             res = int(aspect * input_height)
@@ -41,7 +42,7 @@ class Processing:
 
     @staticmethod
     def normalize(img, mean=128, std=128):
-        img = (img * 256 - mean) / std
+        img = (skimage.img_as_float(img) *256 - mean) / std
         return img
 
     @staticmethod
@@ -64,6 +65,7 @@ class Processing:
     def prepare_input(img_uri):
         img = Processing.load_image(img_uri)
         # original_shape = img.shape
+        #img = transform.resize(img, (300, 300))
         img = Processing.rescale(img, 300, 300)
         img = Processing.crop_center(img, 300, 300)
         img = Processing.normalize(img)
