@@ -10,4 +10,4 @@ class Configs:
                            'normalize_std': (0.5, 0.5, 0.5)}
     decode_result = {'criteria': 0.5,
                      'max_output': 20,
-                     'pic_threshold': 0.5}
+                     'pic_threshold': 0.56}

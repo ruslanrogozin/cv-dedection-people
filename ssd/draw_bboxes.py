@@ -29,8 +29,8 @@ def draw_bboxes(
                           (0, 0, 255), 2, cv2.LINE_AA)
 
             cv2.putText(
-                original, 'person', (x1, y1-10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+                original, 'person', (x1, y1+20),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 25, 255), 2)
 
     # cv2.imshow('image', original)
     # cv2.waitKey(0)
