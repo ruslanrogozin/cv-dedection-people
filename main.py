@@ -1,7 +1,7 @@
 from pathlib import Path
 from ssd.entrypoints import nvidia_ssd
 from config.config import Configs
-from detect_image import detect_image
+from detect_images import detect_images
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     )
     model.eval()  # Что происходит при переходи в режим eval.
 
-    detect_image(model=model,
+    detect_images(model=model,
                  configs=configs,
                  work_directory=work_directory)
 
