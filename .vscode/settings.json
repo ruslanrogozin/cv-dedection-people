@@ -1,6 +1,7 @@
 {
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.enabled": true,
     "python.linting.banditEnabled": false,
-    "autoflake-extension.remove-all-unused-imports":  true
+    "autoflake-extension.remove-all-unused-imports": true,
+    "python.linting.pylintEnabled": true
 }
