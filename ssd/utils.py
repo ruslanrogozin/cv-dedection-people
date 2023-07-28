@@ -1,9 +1,7 @@
-import torch
-import torchvision.transforms as transforms
-import itertools
-import torch.nn.functional as F
 from math import sqrt
-
+import itertools
+import torch
+import torch.nn.functional as F
 import numpy as np
 
 
@@ -127,7 +125,8 @@ class Encoder(object):
             bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:]
             + self.dboxes_xywh[:, :, :2]
         )
-        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * self.dboxes_xywh[:, :, 2:]
+        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * \
+            self.dboxes_xywh[:, :, 2:]
 
         # Transform format to ltrb
         l, t, r, b = (
@@ -149,9 +148,9 @@ class Encoder(object):
         bboxes, probs = self.scale_back_batch(bboxes_in, scores_in)
         # scores input [N,  8732 ,81]
         output = []
-        for bbox, prob in zip(bboxes.split(1, 0), probs.split(1, 0)): # iterate over batches
-            bbox = bbox.squeeze(0) #[1, 8732,4]) -> [ 8732, 4])
-            prob = prob.squeeze(0) # [1, 8732, 81] -> [ 8732, 81]
+        for bbox, prob in zip(bboxes.split(1, 0), probs.split(1, 0)):  # iterate over batches
+            bbox = bbox.squeeze(0)  # [1, 8732,4]) -> [ 8732, 4])
+            prob = prob.squeeze(0)  # [1, 8732, 81] -> [ 8732, 81]
             output.append(self.decode_single(bbox, prob, criteria, max_output))
         return output
 
@@ -163,7 +162,8 @@ class Encoder(object):
         scores_out = []
         labels_out = []
         # iterate by class
-        for i, score in enumerate(scores_in.split(1, 1)):# get score.shape = scores_in  torch.Size([8732, 1])
+        # get score.shape = scores_in  torch.Size([8732, 1])
+        for i, score in enumerate(scores_in.split(1, 1)):
             # skip background
             # print(score[score>0.90])
             if i == 0:
@@ -188,7 +188,8 @@ class Encoder(object):
                 idx = score_idx_sorted[-1].item()
                 bboxes_sorted = bboxes[score_idx_sorted, :]
                 bboxes_idx = bboxes[idx, :].unsqueeze(dim=0)
-                iou_sorted = calc_iou_tensor(bboxes_sorted, bboxes_idx).squeeze()
+                iou_sorted = calc_iou_tensor(
+                    bboxes_sorted, bboxes_idx).squeeze()
                 # we only need iou < criteria
                 score_idx_sorted = score_idx_sorted[iou_sorted < criteria]
                 candidates.append(idx)
@@ -237,7 +238,7 @@ class DefaultBoxes(object):
         fk = fig_size / np.array(steps)
         self.aspect_ratios = aspect_ratios
 
-        self.default_boxes = [] # (8732, 4);
+        self.default_boxes = []  # (8732, 4);
         # size of feature and number of feature
         for idx, sfeat in enumerate(self.feat_size):
 
@@ -287,4 +288,4 @@ def dboxes300_coco():
     scales = [21, 45, 99, 153, 207, 261, 315]
     aspect_ratios = [[2], [2, 3], [2, 3], [2, 3], [2], [2]]
     dboxes = DefaultBoxes(figsize, feat_size, steps, scales, aspect_ratios)
-    return dboxes # return class with dboxes as  (8732, 4)
+    return dboxes  # return class with dboxes as  (8732, 4)
