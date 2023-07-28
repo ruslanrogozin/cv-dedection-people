@@ -1,19 +1,8 @@
 import numpy as np
-import torch
-import skimage
-from skimage import io, transform
-
 from .utils import dboxes300_coco, Encoder
 
 
 class Processing:
-    @staticmethod
-    def load_image(image_path):
-        """Code from Loading_Pretrained_Models.ipynb - a Caffe2 tutorial"""
-        img = skimage.img_as_float(io.imread(image_path))
-        if len(img.shape) == 2:
-            img = np.array([img, img, img]).swapaxes(0, 2)
-        return img
 
     @staticmethod
     def decode_results(predictions, criteria=0.5, max_output=20):

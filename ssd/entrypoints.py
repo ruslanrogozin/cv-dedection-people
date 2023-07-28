@@ -1,7 +1,7 @@
 # https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/ssd/entrypoints.py
 import os
-import torch
 import sys
+import torch
 import urllib.request
 from pathlib import Path
 
