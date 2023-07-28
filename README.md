@@ -4,6 +4,4 @@
 2. create virtual environment python -m venv .venv
 3. activate venv
 4. install requirements.txt
-5. run main.py
-
-
+5. run main.
