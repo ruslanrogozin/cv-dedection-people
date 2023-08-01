@@ -1,7 +1,31 @@
 # Detection of people with pre-trained ssd 300 from nvidia
-## run project
-1. clone on local pc
-2. create virtual environment python -m venv .venv
-3. activate venv
-4. install requirements.txt
-5. run main.
+Детекция людей при помощи предобученной сети ssd300 от NVIDIA
+## Запуск проекта
+1. скопировать на локальный пк
+2. создать виртуальное окружение virtual environment python -m venv .venv
+3. активировать его
+4. установить зависимости install requirements.txt
+5. заупстить файл main.py
+
+## Структура проекта
+## Общая структура фреймворка
+```
+repository
+    └── config.py
+            └── config.py                                # файл с настройками 
+                             
+    └── data                                             # папка, в которую необходимо поместить данные
+    │                   
+    └── ssd                                              # все необходимые скрипты для обучения ssd300
+    │       └── create_model.py                          # функция загрузки весов и создания модели
+    │       └── dataloader.py                            # реализован класс, выполняющий чтение и преподработку всех изображений
+    │       └── model.py                                 # код слоев модели
+    │       └── nvidia_ssd_processing_utils.py           # запуск функций, необходимых для обработки выхода модели
+    │       └── utils_ssd300.py                          # реализация функций, необходимыъ для обработки сырого выхода модели                                    
+    └── utils
+    │                                                   # Утилитры для модели
+    │       └── utils.py                                
+    └── detect_images.py                                # Функция для детектирования всех изображений из папки data
+    └── detect_one_image.py                             # Функция для детектирования всех видео из папки data
+    └── main.py                                         # Запуск детекции                         
+```
