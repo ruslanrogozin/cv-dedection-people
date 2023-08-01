@@ -3,9 +3,9 @@ from tqdm import tqdm
 import torch
 import cv2
 
-from ssd.draw_bboxes import draw_bboxes
 from ssd.nvidia_ssd_processing_utils import Processing as processing
 from ssd.dataloader import ImagesDataset
+from utils.draw_bboxes import draw_bboxes
 
 
 def detect_images(model, configs, work_directory):
@@ -17,7 +17,6 @@ def detect_images(model, configs, work_directory):
         device=device,
         transform='DEFAULT',
         resize_size=configs.image_loader_params['resize_size'],
-        center_crop_cize=configs.image_loader_params['center_crop_cize'],
         normalize_mean=configs.image_loader_params['normalize_mean'],
         normalize_std=configs.image_loader_params['normalize_std']
     )
@@ -41,7 +40,10 @@ def detect_images(model, configs, work_directory):
             threshold=configs.decode_result['pic_threshold'])
 
         new_image = draw_bboxes(
-            best_results_per_input, file)
+            prediction=best_results_per_input,
+            original=file,
+            use_padding=configs.use_padding_in_image_transform
+        )
 
         orginal_name = Path(file).name
         path_save_image = work_directory / configs.path_new_data

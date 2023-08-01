@@ -1,11 +1,12 @@
+from pathlib import Path
+import sys
 from torch.utils.data import Dataset
 from torchvision import transforms
 import torch
-from ssd.nvidia_ssd_processing_utils import Processing as processing
-from torchvision.datasets.folder import pil_loader
-from pathlib import Path
-import sys
 from PIL import Image
+from utils.utils import SquarePad
+
+
 
 
 class ImagesDataset(Dataset):
@@ -17,8 +18,7 @@ class ImagesDataset(Dataset):
     def __init__(self, path,
                  device='cpu',
                  transform='DEFAULT',
-                 resize_size = 300,
-                 center_crop_cize = 300,
+                 resize_size=300,
                  normalize_mean=(0.5, 0.5, 0.5),
                  normalize_std=(0.5, 0.5, 0.5)
                  ):
@@ -27,9 +27,7 @@ class ImagesDataset(Dataset):
         self.device = device
         self.normalize_mean = normalize_mean
         self.normalize_std = normalize_std
-
-        self.resize_size = resize_size,
-        self.center_crop_cize = center_crop_cize,
+        self.resize_size = resize_size
 
         IMAGE_DIR = Path(path)
         jpg = list(IMAGE_DIR.rglob("*.jpg"))
@@ -46,8 +44,9 @@ class ImagesDataset(Dataset):
 
         if transform == 'DEFAULT':
             self.transform = transforms.Compose([
+                SquarePad(),
                 transforms.Resize(self.resize_size),
-                transforms.CenterCrop(self.center_crop_cize),
+                transforms.CenterCrop(300),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=self.normalize_mean,
                                      std=self.normalize_std)])
