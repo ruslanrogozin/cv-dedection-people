@@ -16,14 +16,13 @@ def detect_image(model,
     img1 = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img1, 'RGB')
 
-
     resize_size = configs.image_loader_params['resize_size']
     normalize_mean = configs.image_loader_params['normalize_mean']
     normalize_std = configs.image_loader_params['normalize_std']
 
     transform = transforms.Compose([
         SquarePad(),
-        transforms.Resize(300),
+        transforms.Resize(resize_size),
         transforms.CenterCrop(300),
         transforms.ToTensor(),
         transforms.Normalize(mean=normalize_mean,

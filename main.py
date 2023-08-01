@@ -16,7 +16,7 @@ def main():
         path=work_directory / configs.path_weight_model,
         device=device
     )
-    model.eval()  # Что происходит при переходи в режим eval.
+    model.eval()
 
     try:
         detect_images(model=model,
@@ -25,12 +25,12 @@ def main():
     except Exception:
         print('no images found!')
 
-    #try:
-    detect_video(model=model,
+    try:
+        detect_video(model=model,
                      configs=configs,
                      work_directory=work_directory)
-    #except Exception:
-        #print('no video found!')
+    except Exception:
+        print('no video found!')
 
 
 if __name__ == "__main__":
