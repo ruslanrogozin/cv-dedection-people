@@ -5,17 +5,15 @@ import cv2
 
 from ssd.nvidia_ssd_processing_utils import Processing as processing
 from ssd.dataloader import ImagesDataset
-from utils.draw_bboxes import draw_bboxes
+from utils.utils import draw_bboxes
 
 
 def detect_images(model, configs, work_directory):
     device = configs.device
-    work_directory = Path().cwd()  # Path(__file__)
 
     data = ImagesDataset(
         path=work_directory / configs.path_data,
         device=device,
-        transform='DEFAULT',
         resize_size=configs.image_loader_params['resize_size'],
         normalize_mean=configs.image_loader_params['normalize_mean'],
         normalize_std=configs.image_loader_params['normalize_std']

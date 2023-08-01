@@ -1,7 +1,8 @@
 from pathlib import Path
-from ssd.entrypoints import nvidia_ssd
+from ssd.create_model import nvidia_ssd
 from config.config import Configs
 from detect_images import detect_images
+from detect_video import detect_video
 
 
 def main():
@@ -17,9 +18,19 @@ def main():
     )
     model.eval()  # Что происходит при переходи в режим eval.
 
-    detect_images(model=model,
-                 configs=configs,
-                 work_directory=work_directory)
+    try:
+        detect_images(model=model,
+                      configs=configs,
+                      work_directory=work_directory)
+    except Exception:
+        print('no images found!')
+
+    #try:
+    detect_video(model=model,
+                     configs=configs,
+                     work_directory=work_directory)
+    #except Exception:
+        #print('no video found!')
 
 
 if __name__ == "__main__":

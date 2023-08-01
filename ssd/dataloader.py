@@ -1,12 +1,9 @@
 from pathlib import Path
-import sys
 from torch.utils.data import Dataset
 from torchvision import transforms
 import torch
 from PIL import Image
 from utils.utils import SquarePad
-
-
 
 
 class ImagesDataset(Dataset):
@@ -37,23 +34,20 @@ class ImagesDataset(Dataset):
         images.extend(jpg)
         images.extend(jpeg)
         images.extend(png)
-        if not images:
-            sys.exit("Data directory is empty")
+        assert len(images) != 0, 'no images found'
+
         self.images = images
         self._len = len(self.images)
 
-        if transform == 'DEFAULT':
-            self.transform = transforms.Compose([
-                SquarePad(),
-                transforms.Resize(self.resize_size),
-                transforms.CenterCrop(300),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=self.normalize_mean,
-                                     std=self.normalize_std)])
-            # [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-            # mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
-        else:
-            self.transform = transform
+        self.transform = transforms.Compose([
+            SquarePad(),
+            transforms.Resize(self.resize_size),
+            transforms.CenterCrop(300),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=self.normalize_mean,
+                                 std=self.normalize_std)])
+        # [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        # mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
 
     def __len__(self):
         return self._len
