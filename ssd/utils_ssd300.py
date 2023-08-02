@@ -19,8 +19,8 @@ def calc_iou_tensor(box1, box2):
     N = box1.size(0)
     M = box2.size(0)
 
-    be1 = box1.unsqueeze(1).expand(-1, M, -1)
-    be2 = box2.unsqueeze(0).expand(N, -1, -1)
+    be1 = box1.unsqueeze(1)#.expand(-1, M, -1)
+    be2 = box2.unsqueeze(0)#.expand(N, -1, -1)
 
     # Left Top & Right Bottom
     lt = torch.max(be1[:, :, :2], be2[:, :, :2])

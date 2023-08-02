@@ -10,7 +10,7 @@ class ResNet(nn.Module):
 
         # backbone == 'resnet50':
         backbone = resnet50(weights=None if backbone_path else weights)
-        self.out_channels = [1024, 512, 512, 256, 256, 256]
+        self.out_channels = [1024, 512, 512, 256, 256, 256] # размеры каналов для дополнительных сверток, можно менять
         self.feature_extractor = nn.Sequential(*list(backbone.children())[:7])
 
         conv4_block1 = self.feature_extractor[-1][0]
