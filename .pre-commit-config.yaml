@@ -45,3 +45,8 @@ repos:
       hooks:
         - id: pycln
           args: [ --all ]
+
+    -   repo: https://github.com/PyCQA/autoflake
+        rev: v2.2.0
+        hooks:
+          -   id: autoflake
