@@ -1,10 +1,11 @@
 from pathlib import Path
-from tqdm import tqdm
-import torch
-import cv2
 
-from ssd.nvidia_ssd_processing_utils import Processing as processing
+import cv2
+import torch
+from tqdm import tqdm
+
 from ssd.dataloader import ImagesDataset
+from ssd.nvidia_ssd_processing_utils import Processing as processing
 from utils.utils import draw_bboxes
 
 

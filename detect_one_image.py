@@ -1,10 +1,10 @@
-from torchvision import transforms
+import cv2
 import torch
 from PIL import Image
-import cv2
-from utils.utils import SquarePad, draw_bboxes
+from torchvision import transforms
 
 from ssd.nvidia_ssd_processing_utils import Processing as processing
+from utils.utils import SquarePad, draw_bboxes
 
 
 def detect_image(model, image, configs):

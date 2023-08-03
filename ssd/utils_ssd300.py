@@ -1,8 +1,9 @@
-from math import sqrt
 import itertools
+from math import sqrt
+
+import numpy as np
 import torch
 import torch.nn.functional as F
-import numpy as np
 
 
 # This function is from https://github.com/kuangliu/pytorch-ssd.

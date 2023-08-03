@@ -1,5 +1,6 @@
 import numpy as np
-from .utils_ssd300 import dboxes300_coco, Encoder
+
+from .utils_ssd300 import Encoder, dboxes300_coco
 
 
 class Processing:
@@ -25,10 +26,10 @@ class Processing:
 
         if not os.path.exists(file_with_coco_names):
             print("Downloading COCO annotations.")
-            import urllib
-            import zipfile
             import json
             import shutil
+            import urllib
+            import zipfile
 
             urllib.request.urlretrieve(
                 "http://images.cocodataset.org/annotations/annotations_trainval2017.zip",

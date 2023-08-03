@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import cv2
 
 from detect_one_image import detect_image
