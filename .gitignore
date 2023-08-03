@@ -4,4 +4,6 @@
 data/
 *__pycache__
 *.pt
-*COCO_data
+/COCOdata
+*instances_val2017.json
+/train_model/instances_val2017.json

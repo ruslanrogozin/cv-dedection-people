@@ -77,7 +77,7 @@ class CocoDataReader(Dataset):
 
         bbox_sizes = torch.tensor(bbox_sizes)
         bbox_labels =  torch.tensor(bbox_labels)
-        print(bbox_label)
+
 
 
         #img.show()

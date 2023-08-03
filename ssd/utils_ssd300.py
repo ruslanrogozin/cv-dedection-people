@@ -19,8 +19,8 @@ def calc_iou_tensor(box1, box2):
     N = box1.size(0)
     M = box2.size(0)
 
-    be1 = box1.unsqueeze(1)#.expand(-1, M, -1)
-    be2 = box2.unsqueeze(0)#.expand(N, -1, -1)
+    be1 = box1.unsqueeze(1).expand(-1, M, -1)
+    be2 = box2.unsqueeze(0).expand(N, -1, -1)
 
     # Left Top & Right Bottom
     lt = torch.max(be1[:, :, :2], be2[:, :, :2])
@@ -76,14 +76,17 @@ class Encoder(object):
     def encode(self, bboxes_in, labels_in, criteria=0.5):
 
         ious = calc_iou_tensor(bboxes_in, self.dboxes)
-        best_dbox_ious, best_dbox_idx = ious.max(dim=0)
-        best_bbox_ious, best_bbox_idx = ious.max(dim=1)
+        best_dbox_ious, best_dbox_idx = ious.max(dim=0)# выдает номера (строк) ббох, которые набилее юлизки к якорным, массив размера 8732
+        best_bbox_ious, best_bbox_idx = ious.max(dim=1) # номер (столбцов) якорных ббх, близких к переданным размер массива 19
 
+        #best_bbox_idx = номера столбцов, в которых максимум для каждой из строк!!!! т.е. первое число - максимум в первой строке
+
+        # помещаем максимум ious = 2  на те позиции строк, для которых axis =1 имеет максимум
         # set best ious 2.0
-        best_dbox_ious.index_fill_(0, best_bbox_idx, 2.0)
+        best_dbox_ious.index_fill_(0, best_bbox_idx, 2.0)# т.к. для каждой строки мы нашли максимум, то необходимо положить номера строк в правильном порядке
 
         idx = torch.arange(0, best_bbox_idx.size(0), dtype=torch.int64)
-        best_dbox_idx[best_bbox_idx[idx]] = idx
+        best_dbox_idx[best_bbox_idx[idx]] = idx #  максимумы искали для каждой из строк!!!! т.е. первое число - максимум в первой строке
 
         # filter IoU > 0.5
         masks = best_dbox_ious > criteria
@@ -165,7 +168,6 @@ class Encoder(object):
             # print(score[score>0.90])
             if i == 0:
                 continue
-            # print(i)
 
             score = score.squeeze(1)
             mask = score > 0.05
