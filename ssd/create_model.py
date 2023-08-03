@@ -4,18 +4,12 @@ from pathlib import Path
 import torch
 
 
-def nvidia_ssd(
-    pretrained_default=True,
-    pretrainded_custom=False,
-    path='ssd/',
-    device='cpu'
-):
-    """Constructs an SSD300 model.
-    """
+def nvidia_ssd(pretrained_default=True, pretrainded_custom=False, path="ssd/", device="cpu"):
+    """Constructs an SSD300 model."""
     from . import model as ssd
 
     model = ssd.SSD300()
-    if torch.cuda.is_available() and device == 'cuda':
+    if torch.cuda.is_available() and device == "cuda":
         model = model.cuda()
 
     if isinstance(path, str):
@@ -34,9 +28,9 @@ def nvidia_ssd(
         elif pretrainded_custom:
             path_to_model = path
 
-        if not torch.cuda.is_available() or device == 'cpu':
+        if not torch.cuda.is_available() or device == "cpu":
             ckpt = torch.load(path_to_model, map_location=torch.device("cpu"))
-        elif device == 'cuda' and torch.cuda.is_available():
+        elif device == "cuda" and torch.cuda.is_available():
             ckpt = torch.load(path_to_model)
 
         ckpt = ckpt["model"]

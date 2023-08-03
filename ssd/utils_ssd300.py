@@ -121,12 +121,8 @@ class Encoder(object):
         bboxes_in[:, :, :2] = self.scale_xy * bboxes_in[:, :, :2]
         bboxes_in[:, :, 2:] = self.scale_wh * bboxes_in[:, :, 2:]
 
-        bboxes_in[:, :, :2] = (
-            bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:]
-            + self.dboxes_xywh[:, :, :2]
-        )
-        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * \
-            self.dboxes_xywh[:, :, 2:]
+        bboxes_in[:, :, :2] = bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:] + self.dboxes_xywh[:, :, :2]
+        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * self.dboxes_xywh[:, :, 2:]
 
         # Transform format to ltrb
         l, t, r, b = (
@@ -188,8 +184,7 @@ class Encoder(object):
                 idx = score_idx_sorted[-1].item()
                 bboxes_sorted = bboxes[score_idx_sorted, :]
                 bboxes_idx = bboxes[idx, :].unsqueeze(dim=0)
-                iou_sorted = calc_iou_tensor(
-                    bboxes_sorted, bboxes_idx).squeeze()
+                iou_sorted = calc_iou_tensor(bboxes_sorted, bboxes_idx).squeeze()
                 # we only need iou < criteria
                 score_idx_sorted = score_idx_sorted[iou_sorted < criteria]
                 candidates.append(idx)

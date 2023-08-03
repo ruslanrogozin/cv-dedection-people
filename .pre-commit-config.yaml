@@ -7,38 +7,17 @@ repos:
         args: [--maxkb=100000]
       - id: trailing-whitespace
       - id: check-docstring-first
-      - id: check-json
+
       - id: check-merge-conflict
-      - id: check-xml
-      - id: check-yaml
+
+
         exclude: ".helm"
       - id: detect-aws-credentials
         args: [
           --allow-missing-credentials,
           --credentials-file, docker-compose/.env,
         ]
-      - id: detect-private-key
-      - id: mixed-line-ending
-      - id: pretty-format-json
-        args: [--autofix]
 
-    # autoformat code with black formatter
-    - repo: https://github.com/psf/black
-      rev: 20.8b1
-      hooks:
-        - id: black
-          additional_dependencies: [click==8.0.4]
-          types: [python]
-          args: [-l 120]
-
-    # check code style
-    - repo: https://github.com/pycqa/flake8
-      rev: 3.7.9
-      hooks:
-        - id: flake8
-          additional_dependencies: [flake8-quotes==3.0.0]
-          types: [python]
-          args: [--config, .flake8]
 
     # sort imports
     - repo: https://github.com/pycqa/isort

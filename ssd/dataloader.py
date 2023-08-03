@@ -12,13 +12,15 @@ class ImagesDataset(Dataset):
     производит скалирование и превращение в торчевые тензоры
     """
 
-    def __init__(self, path,
-                 device='cpu',
-                 transform='DEFAULT',
-                 resize_size=300,
-                 normalize_mean=(0.5, 0.5, 0.5),
-                 normalize_std=(0.5, 0.5, 0.5)
-                 ):
+    def __init__(
+        self,
+        path,
+        device="cpu",
+        transform="DEFAULT",
+        resize_size=300,
+        normalize_mean=(0.5, 0.5, 0.5),
+        normalize_std=(0.5, 0.5, 0.5),
+    ):
 
         super().__init__()
         self.device = device
@@ -34,18 +36,20 @@ class ImagesDataset(Dataset):
         images.extend(jpg)
         images.extend(jpeg)
         images.extend(png)
-        assert len(images) != 0, 'no images found'
+        assert len(images) != 0, "no images found"
 
         self.images = images
         self._len = len(self.images)
 
-        self.transform = transforms.Compose([
-            SquarePad(),
-            transforms.Resize(self.resize_size),
-            transforms.CenterCrop(300),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=self.normalize_mean,
-                                 std=self.normalize_std)])
+        self.transform = transforms.Compose(
+            [
+                SquarePad(),
+                transforms.Resize(self.resize_size),
+                transforms.CenterCrop(300),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std),
+            ]
+        )
         # [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         # mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
 
@@ -55,8 +59,8 @@ class ImagesDataset(Dataset):
     def __getitem__(self, index):
         """return torch.tensor(image) and shape original image"""
         file = self.images[index]
-        tensor = Image.open(file).convert('RGB')
+        tensor = Image.open(file).convert("RGB")
         tensor = self.transform(tensor)
-        if self.device == 'cuda' and torch.cuda.is_available():
+        if self.device == "cuda" and torch.cuda.is_available():
             tensor = tensor.cuda()
         return tensor, file
