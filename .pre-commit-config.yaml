@@ -17,8 +17,6 @@ repos:
           --allow-missing-credentials,
           --credentials-file, docker-compose/.env,
         ]
-
-
     # sort imports
     - repo: https://github.com/pycqa/isort
       rev: 5.12.0
