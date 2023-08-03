@@ -31,6 +31,15 @@ repos:
           types: [python]
           args: [-l 120]
 
+    # check code style
+    - repo: https://github.com/pycqa/flake8
+      rev: 3.7.9
+      hooks:
+        - id: flake8
+          additional_dependencies: [flake8-quotes==3.0.0]
+          types: [python]
+          args: [--config, .flake8]
+
     # sort imports
     - repo: https://github.com/pycqa/isort
       rev: 5.12.0
@@ -45,8 +54,3 @@ repos:
       hooks:
         - id: pycln
           args: [ --all ]
-
-    -   repo: https://github.com/PyCQA/autoflake
-        rev: v2.2.0
-        hooks:
-          -   id: autoflake
