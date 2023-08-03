@@ -6,6 +6,7 @@ from detect_video import detect_video
 from pathlib import Path
 
 
+
 def main():
     configs = Configs()
     work_directory = Path().cwd()
