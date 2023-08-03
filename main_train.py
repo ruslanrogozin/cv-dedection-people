@@ -8,6 +8,8 @@ import cv2
 from ssd.utils_ssd300 import dboxes300_coco
 from train_model.train_loader import  CocoDataReader
 from ssd.utils_ssd300 import calc_iou_tensor
+from utils.utils import  SSDCropping
+from PIL import Image, ImageDraw
 
 
 def get_coco_ground_truth():
@@ -33,8 +35,32 @@ def main_train():
 
      #input ltrb format, output xywh format
     img, img_id, size_image, bbox_sizes, bbox_labels = datareader[0]
+
     dboxes(order="ltrb")
     #ios = calc_iou_tensor()
+    #flip = RandomHorizontalFlip()
+    crop = SSDCropping()
+    new_img, _, bboxes, labels = crop(
+
+        img, size_image, bbox_sizes, bbox_labels)
+    #img.show()
+    #new_img.show()
+    draw = ImageDraw.Draw(new_img)
+    htot, wtot = size_image
+    for i in bboxes:
+        l,t,r,b = i.tolist()
+
+        draw.rectangle(((int(l * wtot), int(t * htot)), (int(r * wtot), int(b * htot))))
+    new_img.show()
+        #b = t + h
+        #l, t, r, b = xc - 0.5*w, yc - 0.5*h, xc + 0.5*w, yc + 0.5*h
+       # bbox_size = (l/wtot, t/htot, r/wtot, b/htot)
+        #bbox_sizes.append(bbox_size)
+       # bbox_labels.append(bbox_label)
+
+       # bbox_sizes = torch.tensor(bbox_sizes)
+       # bbox_labels =  torch.tensor(bbox_labels)
+
 
 
 
