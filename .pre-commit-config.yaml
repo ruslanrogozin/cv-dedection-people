@@ -24,3 +24,10 @@ repos:
           additional_dependencies: [click==8.0.4]
           types: [python]
           args: [-l 120]
+
+    # autodelete unused imports
+    - repo: https://github.com/hadialqattan/pycln
+      rev: v1.1.0
+      hooks:
+        - id: pycln
+          args: [ --all ]
