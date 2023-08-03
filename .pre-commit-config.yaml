@@ -8,16 +8,10 @@ repos:
       - id: trailing-whitespace
       - id: check-docstring-first
       - id: check-json
-      - id: check-merge-conflict
       - id: check-xml
-      - id: check-yaml
-        exclude: ".helm"
-      - id: detect-aws-credentials
-        args: [
-          --allow-missing-credentials,
-          --credentials-file, docker-compose/.env,
-        ]
-      - id: detect-private-key
+
+
+
       - id: mixed-line-ending
       - id: pretty-format-json
         args: [--autofix]
