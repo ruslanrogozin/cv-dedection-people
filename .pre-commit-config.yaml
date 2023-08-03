@@ -30,3 +30,18 @@ repos:
           additional_dependencies: [click==8.0.4]
           types: [python]
           args: [-l 120]
+
+    # sort imports
+    - repo: https://github.com/pycqa/isort
+      rev: 5.12.0
+      hooks:
+        - id: isort
+          files: ^(breastcancer|tests)
+          args: ["--profile", "black", "--trailing-comma", "--multi-line", "3"]
+
+    # autodelete unused imports
+    - repo: https://github.com/hadialqattan/pycln
+      rev: v1.1.0
+      hooks:
+        - id: pycln
+          args: [ --all ]
