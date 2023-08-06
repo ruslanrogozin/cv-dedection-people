@@ -12,6 +12,7 @@ def detect_video(
     device=Configs.device,
     path_to_data=Configs.path_data,
     path_new_data=Configs.path_new_data,
+    batch_size=Configs.batch_size,
 ):
     print("run detect video")
     if isinstance(path_to_data, str):
@@ -46,16 +47,14 @@ def detect_video(
         f_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         f_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        out = cv2.VideoWriter(
-            str(path_save_video), fourcc, fps, (f_width, f_height)
-        )
-        batch_size = fps / 6
+        out = cv2.VideoWriter(str(path_save_video), fourcc, fps, (f_width, f_height))
+        batch_number = total_frames // batch_size + int((total_frames % batch_size) > 0)
 
         pbar = tqdm(
-            total=total_frames / batch_size,
+            total=batch_number,
             desc="extracting frames at fps: {}".format(fps),
         )
-
+        count = 0
         batch = []
         while cap.isOpened():
             ret, image = cap.read()
@@ -63,16 +62,18 @@ def detect_video(
             if not ret:
                 break
             batch.append(image)
-            if len(batch) == batch_size:
 
-                new_images = detect_image(
-                    model=model, device=device, images=batch
-                )
+            if (len(batch) == batch_size) or (
+                (total_frames % batch_size == len(batch))
+                and (count == batch_number - 1)
+            ):
+                new_images = detect_image(model=model, device=device, images=batch)
                 for new_image in new_images:
                     out.write(new_image)
 
                 batch = []
                 pbar.update(1)
+                count += 1
 
         pbar.close()
         print(batch)

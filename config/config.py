@@ -4,5 +4,6 @@ class Configs:
     path_weight_model = "weight"
     path_new_data = "new_data"
     device = "cpu"
+    batch_size = 22
     use_padding_in_image_transform = True
     decode_result = {"criteria": 0.5, "max_output": 20, "pic_threshold": 0.3}
