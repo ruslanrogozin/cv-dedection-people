@@ -1,4 +1,3 @@
-from pathlib import Path
 
 import torch
 from PIL import Image
@@ -18,18 +17,11 @@ class ImagesDataset(Dataset):
         self,
         path,
         device="cpu",
-        transform="DEFAULT",
-        resize_size=300,
-        normalize_mean=(0.5, 0.5, 0.5),
-        normalize_std=(0.5, 0.5, 0.5),
     ):
         super().__init__()
         self.device = device
-        self.normalize_mean = normalize_mean
-        self.normalize_std = normalize_std
-        self.resize_size = resize_size
 
-        IMAGE_DIR = Path(path)
+        IMAGE_DIR = path
         jpg = list(IMAGE_DIR.rglob("*.jpg"))
         jpeg = list(IMAGE_DIR.rglob("*.jpeg"))
         png = list(IMAGE_DIR.rglob("*.png"))
@@ -44,10 +36,10 @@ class ImagesDataset(Dataset):
         self.transform = transforms.Compose(
             [
                 SquarePad(),
-                transforms.Resize((self.resize_size)),
+                transforms.Resize((300, 300)),
                 transforms.ToTensor(),
                 transforms.Normalize(
-                    mean=self.normalize_mean, std=self.normalize_std
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
                 ),
             ]
         )
