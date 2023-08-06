@@ -1,4 +1,3 @@
-
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
@@ -43,8 +42,6 @@ class ImagesDataset(Dataset):
                 ),
             ]
         )
-        # [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        # mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))])
 
     def __len__(self):
         return self._len

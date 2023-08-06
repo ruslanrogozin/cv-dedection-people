@@ -15,6 +15,9 @@ def detect_images(
     device=Configs.device,
     path_to_data=Configs.path_data,
     path_new_data=Configs.path_new_data,
+    criteria_iou=Configs.decode_result["criteria"],
+    max_output_iou=Configs.decode_result["max_output"],
+    prob_threshold=Configs.decode_result["pic_threshold"],
 ):
     if isinstance(path_to_data, str):
         path_to_data = Path(path_to_data)
@@ -39,13 +42,13 @@ def detect_images(
 
         results_per_input = processing.decode_results(
             predictions=detections,
-            criteria=Configs.decode_result["criteria"],
-            max_output=Configs.decode_result["max_output"],
+            criteria=criteria_iou,
+            max_output=max_output_iou,
         )
 
         best_results_per_input = processing.pick_best(
             detections=results_per_input[0],
-            threshold=Configs.decode_result["pic_threshold"],
+            threshold=prob_threshold,
         )
 
         new_image = draw_bboxes(
