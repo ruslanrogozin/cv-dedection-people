@@ -17,6 +17,7 @@ def main():
         path=work_directory/ configs.path_weight_model,
         device=device,
     )
+    return
     model.eval()
 
     detect_images(
