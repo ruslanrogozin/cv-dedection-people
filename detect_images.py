@@ -57,7 +57,7 @@ def detect_images(
             use_padding=Configs.use_padding_in_image_transform,
         )
 
-        orginal_name = Path(file).name
+        orginal_name = file.name
         path_save_image = path_new_data
         path_save_image = path_save_image / ("new_" + orginal_name)
         cv2.imwrite(str(path_save_image), new_image)
