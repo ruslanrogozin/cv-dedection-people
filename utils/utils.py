@@ -1,14 +1,12 @@
+import random
+
 import cv2
 import numpy as np
-<<<<<<< HEAD
-=======
-import random
 import torch
-from PIL import Image
-from ssd.utils_ssd300 import calc_iou_tensor
->>>>>>> 006b39c (create requerements)
 import torchvision.transforms.functional as F
-import torchvision.transforms as transforms
+from PIL import Image
+
+from ssd.utils_ssd300 import calc_iou_tensor
 
 
 class SquarePad(object):

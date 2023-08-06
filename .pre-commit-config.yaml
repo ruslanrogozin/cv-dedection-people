@@ -1,5 +1,5 @@
 repos:
-<<<<<<< HEAD
+
     # general hooks to verify or beautify code
     - repo: http://github.com/pre-commit/pre-commit-hooks
       rev: v2.5.0
@@ -33,12 +33,3 @@ repos:
           args: [ --all ]
 
 
-
-=======
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-added-large-files
->>>>>>> 8e7e0c5 (123)
