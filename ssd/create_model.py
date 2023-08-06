@@ -4,12 +4,14 @@ from pathlib import Path
 
 import torch
 
+from config.config import Configs
+
 
 def nvidia_ssd(
     pretrained_default=True,
     pretrainded_custom=False,
-    path="ssd/",
-    device="cpu",
+    path=Configs.path_weight_model,
+    device=Configs.device,
 ):
     """Constructs an SSD300 model."""
     from . import model as ssd

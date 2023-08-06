@@ -3,6 +3,6 @@
 /new_data
 data/
 *__pycache__
-*.pt
 COCOdata/
 train_model
+weight/
