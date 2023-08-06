@@ -4,7 +4,7 @@ import cv2
 from tqdm import tqdm
 
 from config.config import Configs
-from detect_one_image import detect_image
+from detect_batch_image import detect_image
 
 
 def detect_video(
@@ -13,7 +13,7 @@ def detect_video(
     path_to_data=Configs.path_data,
     path_new_data=Configs.path_new_data,
 ):
-    print('run detect video')
+    print("run detect video")
     if isinstance(path_to_data, str):
         path_to_data = Path(path_to_data)
     if isinstance(path_new_data, str):
@@ -49,24 +49,34 @@ def detect_video(
         out = cv2.VideoWriter(
             str(path_save_video), fourcc, fps, (f_width, f_height)
         )
+        batch_size = fps / 6
 
-        pbar= tqdm(total=total_frames, desc="extracting frames at fps: {}".format(fps))
+        pbar = tqdm(
+            total=total_frames / batch_size,
+            desc="extracting frames at fps: {}".format(fps),
+        )
 
-        while True:
+        batch = []
+        while cap.isOpened():
             ret, image = cap.read()
 
             if not ret:
                 break
+            batch.append(image)
+            if len(batch) == batch_size:
 
-            new_image = detect_image(model=model, device=device, image=image)
+                new_images = detect_image(
+                    model=model, device=device, images=batch
+                )
+                for new_image in new_images:
+                    out.write(new_image)
 
+                batch = []
+                pbar.update(1)
 
-
-
-            out.write(new_image)
-
-            pbar.update(1)
         pbar.close()
+        print(batch)
+
         cap.release()
         out.release()
         cv2.destroyAllWindows()
