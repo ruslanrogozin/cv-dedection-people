@@ -23,7 +23,6 @@ class ImagesDataset(Dataset):
         normalize_mean=(0.5, 0.5, 0.5),
         normalize_std=(0.5, 0.5, 0.5),
     ):
-
         super().__init__()
         self.device = device
         self.normalize_mean = normalize_mean
@@ -38,7 +37,6 @@ class ImagesDataset(Dataset):
         images.extend(jpg)
         images.extend(jpeg)
         images.extend(png)
-        assert len(images) != 0, "no images found"
 
         self.images = images
         self._len = len(self.images)
@@ -46,10 +44,11 @@ class ImagesDataset(Dataset):
         self.transform = transforms.Compose(
             [
                 SquarePad(),
-                transforms.Resize(self.resize_size),
-                transforms.CenterCrop(300),
+                transforms.Resize((self.resize_size)),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std),
+                transforms.Normalize(
+                    mean=self.normalize_mean, std=self.normalize_std
+                ),
             ]
         )
         # [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])

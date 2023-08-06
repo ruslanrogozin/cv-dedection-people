@@ -5,7 +5,12 @@ from pathlib import Path
 import torch
 
 
-def nvidia_ssd(pretrained_default=True, pretrainded_custom=False, path="ssd/", device="cpu"):
+def nvidia_ssd(
+    pretrained_default=True,
+    pretrainded_custom=False,
+    path="ssd/",
+    device="cpu",
+):
     """Constructs an SSD300 model."""
     from . import model as ssd
 
@@ -17,7 +22,6 @@ def nvidia_ssd(pretrained_default=True, pretrainded_custom=False, path="ssd/", d
         path = Path(path)
 
     if pretrained_default or pretrainded_custom:
-
         if pretrained_default:
             checkpoint = "https://api.ngc.nvidia.com/v2/models/nvidia/ssd_pyt_ckpt_amp/versions/20.06.0/files/nvidia_ssdpyt_amp_200703.pt"
             model_name = str(Path(checkpoint).name)

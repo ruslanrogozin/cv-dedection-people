@@ -19,15 +19,9 @@ def main():
     )
     model.eval()
 
-    try:
-        detect_images(model=model, configs=configs, work_directory=work_directory)
-    except Exception:
-        print("no images found!")
+    detect_images(model=model, configs=configs, work_directory=work_directory)
 
-    try:
-        detect_video(model=model, configs=configs, work_directory=work_directory)
-    except Exception:
-        print("no video found!")
+    detect_video(model=model, configs=configs, work_directory=work_directory)
 
 
 if __name__ == "__main__":

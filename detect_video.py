@@ -10,7 +10,6 @@ def detect_video(
     configs,
     work_directory,
 ):
-
     device = configs.device
     VIDEO_DIR = work_directory / configs.path_data
 
@@ -21,9 +20,13 @@ def detect_video(
     videos.extend(mp4)
     videos.extend(avi)
 
-    assert len(videos) != 0, "no video found"
+    if len(videos) == 0:
+        print("no video found")
+        return
 
-    Path(work_directory / configs.path_new_data).mkdir(parents=True, exist_ok=True)
+    Path(work_directory / configs.path_new_data).mkdir(
+        parents=True, exist_ok=True
+    )
 
     for video in videos:
         orginal_name = Path(video).name
@@ -37,7 +40,9 @@ def detect_video(
         f_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         f_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        out = cv2.VideoWriter(str(path_save_video), fourcc, fps, (f_width, f_height))
+        out = cv2.VideoWriter(
+            str(path_save_video), fourcc, fps, (f_width, f_height)
+        )
 
         while True:
             ret, image = cap.read()

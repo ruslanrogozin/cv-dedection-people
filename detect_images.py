@@ -19,7 +19,9 @@ def detect_images(model, configs, work_directory):
         normalize_mean=configs.image_loader_params["normalize_mean"],
         normalize_std=configs.image_loader_params["normalize_std"],
     )
-
+    if len(data.images) == 0:
+        print("no images found!")
+        return
     Path(work_directory / configs.path_new_data).mkdir(parents=True, exist_ok=True)
 
     for image, file in tqdm(data):
