@@ -42,5 +42,4 @@ def nvidia_ssd(
 
         ckpt = ckpt["model"]
         model.load_state_dict(ckpt)
-
     return model
