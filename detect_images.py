@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from config.config import Configs
 from ssd.dataloader import ImagesDataset
-from ssd.nvidia_ssd_processing_utils import Processing as processing
+from ssd.decode_results import Processing as processing
 from utils.utils import draw_bboxes
 
 
@@ -19,6 +19,8 @@ def detect_images(
     max_output_iou=Configs.decode_result["max_output"],
     prob_threshold=Configs.decode_result["pic_threshold"],
 ):
+    print("run detect images")
+    model.eval()
     if isinstance(path_to_data, str):
         path_to_data = Path(path_to_data)
     if isinstance(path_new_data, str):

@@ -4,17 +4,17 @@ from PIL import Image
 from torchvision import transforms
 
 from config.config import Configs
-from ssd.nvidia_ssd_processing_utils import Processing as processing
+from ssd.decode_results import Processing as processing
 from utils.utils import SquarePad, draw_bboxes
 
 
 def detect_image(
     model,
     images,
-    device,
+    device=Configs.device,
     criteria_iou=Configs.decode_result["criteria"],
     max_output_iou=Configs.decode_result["max_output"],
-    prob_threshold=Configs.decode_result["pic_threshold"],
+    prob_threshold=Configs.decode_result["pic_threshold"]
 ):
     inputs = []
     for image in images:

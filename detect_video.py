@@ -13,8 +13,12 @@ def detect_video(
     path_to_data=Configs.path_data,
     path_new_data=Configs.path_new_data,
     batch_size=Configs.batch_size,
+    criteria_iou=Configs.decode_result["criteria"],
+    max_output_iou=Configs.decode_result["max_output"],
+    prob_threshold=Configs.decode_result["pic_threshold"],
 ):
     print("run detect video")
+    model.eval()
     if isinstance(path_to_data, str):
         path_to_data = Path(path_to_data)
     if isinstance(path_new_data, str):
@@ -67,7 +71,14 @@ def detect_video(
                 (total_frames % batch_size == len(batch))
                 and (count == batch_number - 1)
             ):
-                new_images = detect_image(model=model, device=device, images=batch)
+                new_images = detect_image(
+                    model=model,
+                    device=device,
+                    images=batch,
+                    criteria_iou=criteria_iou,
+                    max_output_iou=max_output_iou,
+                    prob_threshold=prob_threshold,
+                )
                 for new_image in new_images:
                     out.write(new_image)
 
@@ -76,8 +87,6 @@ def detect_video(
                 count += 1
 
         pbar.close()
-        print(batch)
-
         cap.release()
         out.release()
         cv2.destroyAllWindows()

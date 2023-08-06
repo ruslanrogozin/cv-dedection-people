@@ -1,11 +1,17 @@
 import numpy as np
 
+from config.config import Configs
+
 from .utils_ssd300 import Encoder, dboxes300_coco
 
 
 class Processing:
     @staticmethod
-    def decode_results(predictions, criteria=0.5, max_output=20):
+    def decode_results(
+        predictions,
+        criteria=Configs.decode_result["criteria"],
+        max_output=Configs.decode_result["max_output"],
+    ):
         dboxes = dboxes300_coco()
         encoder = Encoder(dboxes)
         ploc, plabel = [val.float() for val in predictions]
@@ -18,7 +24,7 @@ class Processing:
         ]
 
     @staticmethod
-    def pick_best(detections, threshold=0.3):
-        bboxes, classes, confidences = detections
+    def pick_best(detections, threshold=Configs.decode_result["pic_threshold"]):
+        _, _, confidences = detections
         best = np.argwhere(confidences > threshold)[:, 0]
         return [pred[best] for pred in detections]
