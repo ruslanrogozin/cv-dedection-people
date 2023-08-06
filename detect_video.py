@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import cv2
+from tqdm import tqdm
 
 from config.config import Configs
 from detect_one_image import detect_image
@@ -12,6 +13,7 @@ def detect_video(
     path_to_data=Configs.path_data,
     path_new_data=Configs.path_new_data,
 ):
+    print('run detect video')
     if isinstance(path_to_data, str):
         path_to_data = Path(path_to_data)
     if isinstance(path_new_data, str):
@@ -39,6 +41,7 @@ def detect_video(
 
         cap = cv2.VideoCapture(str(video))
         fps = cap.get(cv2.CAP_PROP_FPS)  # fps
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         f_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         f_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -46,6 +49,8 @@ def detect_video(
         out = cv2.VideoWriter(
             str(path_save_video), fourcc, fps, (f_width, f_height)
         )
+
+        pbar= tqdm(total=total_frames, desc="extracting frames at fps: {}".format(fps))
 
         while True:
             ret, image = cap.read()
@@ -55,9 +60,13 @@ def detect_video(
 
             new_image = detect_image(model=model, device=device, image=image)
 
-            cv2.waitKey(0)
+
+
 
             out.write(new_image)
 
+            pbar.update(1)
+        pbar.close()
+        cap.release()
         out.release()
         cv2.destroyAllWindows()
