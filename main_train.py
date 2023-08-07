@@ -1,15 +1,13 @@
+
 import numpy as np
 import torch
+from PIL import ImageDraw
+from pycocotools.coco import COCO
 
 from config.config import Configs
-from pycocotools.coco import COCO
-import json
-import cv2
 from ssd.utils_ssd300 import dboxes300_coco
-from train_model.train_loader import  CocoDataReader
-from ssd.utils_ssd300 import calc_iou_tensor
-from utils.utils import  SSDCropping
-from PIL import Image, ImageDraw
+from train_model.train_loader import CocoDataReader
+from utils.utils import SSDCropping
 
 
 def get_coco_ground_truth():
@@ -19,8 +17,8 @@ def get_coco_ground_truth():
 
 def main_train():
     configs = Configs()
-    torch.manual_seed(configs.random_seed)
-    np.random.seed(seed=configs.random_seed)
+    torch.manual_seed(0)
+    np.random.seed(seed=0)
     #cocoGt =  get_coco_ground_truth()
     #print(cocoGt) # coco аннотации, пока решил сделать все как в исходнике
 
@@ -34,7 +32,7 @@ def main_train():
     #print(datareader.img_keys)
 
      #input ltrb format, output xywh format
-    img, img_id, size_image, bbox_sizes, bbox_labels = datareader[0]
+    img, img_id, size_image, bbox_sizes, bbox_labels = datareader[404484]
 
     dboxes(order="ltrb")
     #ios = calc_iou_tensor()

@@ -5,8 +5,9 @@ import numpy as np
 import torch
 import torchvision.transforms.functional as F
 from PIL import Image
+from torchvision import transforms
 
-from ssd.utils_ssd300 import calc_iou_tensor
+from ssd.utils_ssd300 import Encoder, calc_iou_tensor
 
 
 class SquarePad(object):
@@ -123,7 +124,7 @@ class SSDCropping(object):
         # Ensure always return cropped image
         while True:
             mode = random.choice(self.sample_options)
-            print(mode)
+            #print(mode)
             if mode is None:
                 return img, img_size, bboxes, labels
 
@@ -134,7 +135,7 @@ class SSDCropping(object):
             max_iou = float("+inf") if max_iou is None else max_iou
 
             # Implementation use 50 iteration to find possible candidate
-            for _ in range(1):
+            for _ in range(50):
                 # print('nen')
 
                 # suze of each sampled path in [0.1, 1] 0.3*0.3 approx. 0.1
@@ -189,7 +190,7 @@ class SSDCropping(object):
 
                 htot = bottom_idx - top_idx
                 wtot = right_idx - left_idx
-                img.show()
+                #img.show()
                 return img, (htot, wtot), bboxes, labels
 
 
