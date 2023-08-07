@@ -64,9 +64,9 @@ class CocoDataReader(Dataset):
         bbox_sizes = []
         bbox_labels = []
 
-        #draw = ImageDraw.Draw(img)
+        # draw = ImageDraw.Draw(img)
 
-        for (l,t,w,h), bbox_label in img_data[2]:
+        for (l, t, w, h), bbox_label in img_data[2]:
             r = l + w
             b = t + h
 
@@ -75,6 +75,13 @@ class CocoDataReader(Dataset):
             bbox_labels.append(bbox_label)
 
         bbox_sizes = torch.tensor(bbox_sizes)
-        bbox_labels =  torch.tensor(bbox_labels)
-        #img.show()
-        return img, img_id, (htot, wtot), bbox_sizes, bbox_labels # l t r b
+        bbox_labels = torch.tensor(bbox_labels)
+        # img.show()
+
+        if self.transform is not None:
+            img, (htot, wtot), bbox_sizes, bbox_labels = \
+                self.transform(img, (htot, wtot), bbox_sizes, bbox_labels)
+        else:
+            pass
+
+        return img, img_id, (htot, wtot), bbox_sizes, bbox_labels  # l t r b

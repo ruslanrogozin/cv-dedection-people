@@ -30,7 +30,6 @@ class RandomHorizontalFlip(object):
         return image, bboxes
 
 
-
 class SquarePad:
     def __call__(self, image):
         w, h = image.size
@@ -85,17 +84,17 @@ def draw_bboxes(prediction, original, use_padding=True):
             x1, y1 = int((x1 / 300) * orig_w), int((y1 / 300) * orig_h)
             x2, y2 = int((x2 / 300) * orig_w), int((y2 / 300) * orig_h)
             # draw the bounding boxes around the objects
-            cv2.rectangle(original, (x1, y1), (x2, y2), (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.rectangle(original, (x1, y1), (x2, y2),
+                          (0, 0, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(original, "person", (x1, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 25, 255), 2)
+            cv2.putText(original, "person", (x1, y1 + 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 25, 255), 2)
 
     return original
 
 
-
-
-
 class SSDCropping(object):
+
     """ Cropping for SSD, according to original paper
         Choose between following 3 conditions:
         1. Preserve the original image
@@ -103,6 +102,7 @@ class SSDCropping(object):
         3. Random crop
         Reference to https://github.com/chauhan-utk/src.DomainAdaptation
     """
+
     def __init__(self):
 
         self.sample_options = (
@@ -135,11 +135,11 @@ class SSDCropping(object):
 
             # Implementation use 50 iteration to find possible candidate
             for _ in range(1):
-                #print('nen')
+                # print('nen')
 
                 # suze of each sampled path in [0.1, 1] 0.3*0.3 approx. 0.1
-                w = random.uniform(0.3 , 1.0)
-                h = random.uniform(0.3 , 1.0)
+                w = random.uniform(0.3, 1.0)
+                h = random.uniform(0.3, 1.0)
 
                 if w/h < 0.5 or w/h > 2:
                     continue
@@ -151,7 +151,8 @@ class SSDCropping(object):
                 right = left + w
                 bottom = top + h
 
-                ious = calc_iou_tensor(bboxes, torch.tensor([[left, top, right, bottom]]))
+                ious = calc_iou_tensor(bboxes, torch.tensor(
+                    [[left, top, right, bottom]]))
 
                 # tailor all the bboxes and return
                 if not ((ious > min_iou) & (ious < max_iou)).all():
@@ -176,7 +177,7 @@ class SSDCropping(object):
                 labels = labels[masks]
 
                 left_idx = int(left*wtot)
-                top_idx =  int(top*htot)
+                top_idx = int(top*htot)
                 right_idx = int(right*wtot)
                 bottom_idx = int(bottom*htot)
                 img = img.crop((left_idx, top_idx, right_idx, bottom_idx))
@@ -190,3 +191,66 @@ class SSDCropping(object):
                 wtot = right_idx - left_idx
                 img.show()
                 return img, (htot, wtot), bboxes, labels
+
+
+# Do data augumentation
+class SSDTransformer(object):
+    """ SSD Data Augumentation, according to original paper
+        Composed by several steps:
+        Cropping
+        Resize
+        Flipping
+        Jittering
+    """
+
+    def __init__(self, dboxes, size=(300, 300), val=False):
+
+        # define vgg16 mean
+        self.size = size
+        self.val = val
+
+        self.dboxes_ = dboxes  # DefaultBoxes300()
+        self.encoder = Encoder(self.dboxes_)
+
+        self.crop = SSDCropping()
+        self.img_trans = transforms.Compose([
+            transforms.Resize(self.size),
+            transforms.ColorJitter(brightness=0.125, contrast=0.5,
+                                   saturation=0.5, hue=0.05
+                                   ),
+            transforms.ToTensor()
+        ])
+        self.hflip = RandomHorizontalFlip()
+
+        # All Pytorch Tensor will be normalized
+        # https://discuss.pytorch.org/t/how-to-preprocess-input-for-pre-trained-networks/683
+        self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                              std=[0.229, 0.224, 0.225])
+        self.trans_val = transforms.Compose([
+            transforms.Resize(self.size),
+            transforms.ToTensor(),
+            # ToTensor(),
+            self.normalize,])
+
+    @property
+    def dboxes(self):
+        return self.dboxes_
+
+    def __call__(self, img, img_size, bbox=None, label=None, max_num=200):
+        # img = torch.tensor(img)
+        if self.val:
+            bbox_out = torch.zeros(max_num, 4)
+            label_out = torch.zeros(max_num, dtype=torch.long)
+            bbox_out[:bbox.size(0), :] = bbox
+            label_out[:label.size(0)] = label
+            return self.trans_val(img), img_size, bbox_out, label_out
+
+        img, img_size, bbox, label = self.crop(img, img_size, bbox, label)
+        img, bbox = self.hflip(img, bbox)
+
+        img = self.img_trans(img).contiguous()
+        img = self.normalize(img)
+
+        bbox, label = self.encoder.encode(bbox, label)
+
+        return img, img_size, bbox, label
