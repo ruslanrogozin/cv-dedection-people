@@ -1,8 +1,9 @@
 import json
 import os
+
 import torch
+from PIL import Image
 from torch.utils.data import Dataset
-from PIL import Image, ImageDraw
 
 
 class CocoDataReader(Dataset):
@@ -66,19 +67,14 @@ class CocoDataReader(Dataset):
         #draw = ImageDraw.Draw(img)
 
         for (l,t,w,h), bbox_label in img_data[2]:
-
-            #draw.rectangle(((int(l), int(t)), (int(l + w), int(t + h))))
             r = l + w
             b = t + h
-            #l, t, r, b = xc - 0.5*w, yc - 0.5*h, xc + 0.5*w, yc + 0.5*h
+
             bbox_size = (l/wtot, t/htot, r/wtot, b/htot)
             bbox_sizes.append(bbox_size)
             bbox_labels.append(bbox_label)
 
         bbox_sizes = torch.tensor(bbox_sizes)
         bbox_labels =  torch.tensor(bbox_labels)
-
-
-
         #img.show()
-        return img, img_id, (htot, wtot), bbox_sizes, bbox_labels
+        return img, img_id, (htot, wtot), bbox_sizes, bbox_labels # l t r b

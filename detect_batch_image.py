@@ -61,7 +61,7 @@ def detect_image(
         new_image = draw_bboxes(
             prediction=best_results_per_input,
             original=images[i],
-            use_padding=True,
+            use_padding=Configs.use_padding_in_image_transform,
         )
         output.append(new_image)
 
