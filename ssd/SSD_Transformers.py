@@ -154,7 +154,7 @@ class SSDTransformer(object):
         self.trans_val = transforms.Compose([
             transforms.Resize(self.size),
             transforms.ToTensor(),
-            self.normalize,])
+            self.normalize])
 
     @property
     def dboxes(self):

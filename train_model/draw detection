@@ -1,0 +1,51 @@
+target = []
+preds = []
+
+
+
+for nbatch, data in enumerate(val_dataloader):
+
+    model.eval()
+    img, img_id, images_sizes,  bbox_data, bbox_labels = data
+    with torch.no_grad():
+        ploc, plabel = model(img)
+
+
+    detections = encoder.decode_batch(ploc, plabel, 0.45, 200)        # l t r b
+
+    target = []
+    preds = []
+
+    import torchvision.transforms as T
+
+    for idx in range(ploc.shape[0]):
+
+        htot, wtot = images_sizes[0][idx].item(), images_sizes[1][idx].item()
+
+
+
+        transform = T.ToPILImage()
+
+        pred_bbx = detections[idx][0]
+        prob = detections[idx][2]
+        #pred_bbx = pred_bbx[prob > 0.1]
+
+
+
+        path = 'COCOdata\\val2017\\' + data_val.images[img_id[idx].item()][0]
+        print(path)
+        img_pil = Image.open(path )
+        draw = ImageDraw.Draw(img_pil)
+        # draw true bbx
+        tr_bbx = bbox_labels[idx]>0
+
+        for j in range(len(bbox_data[idx][tr_bbx ])):
+            l,t,r,b = bbox_data[idx][tr_bbx ][j]
+            draw.rectangle(((int(l * wtot), int(t * htot)), (int(r * wtot), int(b * htot))), outline ="red")
+
+        for j in range(pred_bbx.shape[0]):
+            l,t,r,b = pred_bbx[j]
+            draw.rectangle(((int(l * wtot), int(t * htot)), (int(r * wtot), int(b * htot))), outline ="white")
+
+
+        img_pil.show()

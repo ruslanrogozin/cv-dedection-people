@@ -6,4 +6,4 @@ class Configs:
     device = 'cpu'
     batch_size = 25
     use_padding_in_image_transform = False#True
-    decode_result = {"criteria": 0.5, "max_output": 20, "pic_threshold": 0.3}
+    decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.3}
