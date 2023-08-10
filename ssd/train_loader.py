@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 
 class CocoDataReader(Dataset):
-    def __init__(self, img_folder, annotate_file, transform=None):
+    def __init__(self, img_folder, annotate_file,  transform=None):
         self.img_folder = img_folder
         self.annotate_file = annotate_file
 
@@ -18,6 +18,7 @@ class CocoDataReader(Dataset):
         self.images = {}
         self.label_map = {}
         self.label_info = {}
+
 
         # 0 stand for the background
         cnt = 0
@@ -76,12 +77,21 @@ class CocoDataReader(Dataset):
 
         bbox_sizes = torch.tensor(bbox_sizes)
         bbox_labels = torch.tensor(bbox_labels)
+
         # img.show()
 
         if self.transform is not None:
             img, (htot, wtot), bbox_sizes, bbox_labels = \
                 self.transform(img, (htot, wtot), bbox_sizes, bbox_labels)
+            #if self.device == "cuda" and torch.cuda.is_available():
+                #img = img.cuda()
         else:
             pass
+       # if self.device == "cuda" and torch.cuda.is_available():
+
+           # bbox_sizes  = bbox_sizes.cuda()
+            #bbox_labels = bbox_labels.cuda()
+        # img.show()
+
 
         return img, img_id, (htot, wtot), bbox_sizes, bbox_labels  # l t r b
