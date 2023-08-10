@@ -9,7 +9,7 @@ def model_evaluate(model, encoder, val_dataloader, device):
     for _, data in enumerate(tqdm(val_dataloader,
                                   total=len(val_dataloader))):
         model.eval()
-        img, img_id, images_sizes, bbox_data, bbox_labels = data
+        img, _, images_sizes, bbox_data, bbox_labels = data
         with torch.no_grad():
             ploc, plabel = model(img.to(device))
             detections = encoder.decode_batch(ploc, plabel, 0.5, 200)

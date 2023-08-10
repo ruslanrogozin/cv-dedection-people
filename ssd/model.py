@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 from torchvision.models.resnet import resnet50
 
+from config.config import Configs
+
 
 class ResNet(nn.Module):
     def __init__(self, backbone_path=None, weights="IMAGENET1K_V1"):
@@ -133,14 +135,16 @@ class Loss(nn.Module):
         2. Localization Loss: Only on positive labels
         Suppose input dboxes has the shape 8732x4
     """
-    def __init__(self, dboxes):
+
+    def __init__(self, dboxes, device=Configs.device):
         super(Loss, self).__init__()
         self.scale_xy = 1.0/dboxes.scale_xy
         self.scale_wh = 1.0/dboxes.scale_wh
-
+        self.device = device
         self.sl1_loss = nn.SmoothL1Loss(reduction='none')
-        self.dboxes = nn.Parameter(dboxes(order="xywh").transpose(0, 1).unsqueeze(dim = 0),
-            requires_grad=False).cuda()
+        self.dboxes = nn.Parameter(dboxes(order="xywh").transpose(0, 1).unsqueeze(dim=0),
+                                   requires_grad=False).to(device)
+
 
         # Two factor are from following links
         # http://jany.st/post/2017-11-05-single-shot-detector-ssd-from-scratch-in-tensorflow.html
@@ -150,7 +154,8 @@ class Loss(nn.Module):
         """
             Generate Location Vectors
         """
-        gxy = self.scale_xy*(loc[:, :2, :] - self.dboxes[:, :2, :])/self.dboxes[:, 2:, ]
+        gxy = self.scale_xy * \
+            (loc[:, :2, :] - self.dboxes[:, :2, :])/self.dboxes[:, 2:, ]
         gwh = self.scale_wh*(loc[:, 2:, :]/self.dboxes[:, 2:, :]).log()
         return torch.cat((gxy, gwh), dim=1).contiguous()
 
@@ -184,7 +189,7 @@ class Loss(nn.Module):
         neg_num = torch.clamp(3*pos_num, max=mask.size(1)).unsqueeze(-1)
         neg_mask = con_rank < neg_num
 
-        #print(con.shape, mask.shape, neg_mask.shape)
+        # print(con.shape, mask.shape, neg_mask.shape)
         closs = (con*((mask + neg_mask).float())).sum(dim=1)
 
         # avoid no object detected

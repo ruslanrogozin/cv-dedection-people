@@ -83,15 +83,9 @@ class CocoDataReader(Dataset):
         if self.transform is not None:
             img, (htot, wtot), bbox_sizes, bbox_labels = \
                 self.transform(img, (htot, wtot), bbox_sizes, bbox_labels)
-            #if self.device == "cuda" and torch.cuda.is_available():
-                #img = img.cuda()
+
         else:
             pass
-       # if self.device == "cuda" and torch.cuda.is_available():
-
-           # bbox_sizes  = bbox_sizes.cuda()
-            #bbox_labels = bbox_labels.cuda()
-        # img.show()
 
 
         return img, img_id, (htot, wtot), bbox_sizes, bbox_labels  # l t r b
