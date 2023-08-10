@@ -1,4 +1,3 @@
-
 from torch.autograd import Variable
 from tqdm.auto import tqdm
 
