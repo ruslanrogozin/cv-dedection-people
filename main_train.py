@@ -5,8 +5,8 @@ from PIL import ImageDraw
 from pycocotools.coco import COCO
 
 from config.config import Configs
+from ssd.train_loader import CocoDataReader
 from ssd.utils_ssd300 import dboxes300_coco
-from train_model.train_loader import CocoDataReader
 from utils.utils import SSDCropping
 
 
