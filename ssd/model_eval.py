@@ -37,8 +37,8 @@ def model_evaluate(model, encoder, val_dataloader, device):
             preds_dict["labels"] = detections[idx][1].detach().cpu()
             preds.append(preds_dict)
             target.append(true_dict)
-        if i == 10:
-            break
+        #if i == 10:
+            #break
 
     metric = MeanAveragePrecision()
     metric.update(preds, target)
