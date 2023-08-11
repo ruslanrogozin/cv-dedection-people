@@ -1,13 +1,13 @@
 import torch
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 def model_evaluate(model, encoder, val_dataloader, device):
     target = []
     preds = []
-    for _, data in enumerate(tqdm(val_dataloader,
-                                  total=len(val_dataloader))):
+    print("Evaluating")
+    for i, data in enumerate(tqdm(val_dataloader, total=len(val_dataloader))):
         model.eval()
         img, _, images_sizes, bbox_data, bbox_labels = data
         with torch.no_grad():
@@ -17,8 +17,7 @@ def model_evaluate(model, encoder, val_dataloader, device):
         for idx in range(ploc.shape[0]):
             true_dict = dict()
             preds_dict = dict()
-            htot, wtot = images_sizes[0][idx].item(
-            ), images_sizes[1][idx].item()
+            htot, wtot = images_sizes[0][idx].item(), images_sizes[1][idx].item()
             pred_bbx = detections[idx][0]
             tr_bbx = bbox_labels[idx] > 0
             bbx_target = []
@@ -38,9 +37,10 @@ def model_evaluate(model, encoder, val_dataloader, device):
             preds_dict["labels"] = detections[idx][1].detach().cpu()
             preds.append(preds_dict)
             target.append(true_dict)
-        # if nbatch == 4:
-        # break
+        if i == 10:
+            break
 
     metric = MeanAveragePrecision()
     metric.update(preds, target)
-    return metric.compute()
+    compute = metric.compute()
+    return compute

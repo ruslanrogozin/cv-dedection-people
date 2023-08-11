@@ -5,9 +5,10 @@ from tqdm.auto import tqdm
 def train_one_loop(model, optimizer, loss_func, train_dataloader, device):
     print("Training")
     loss_sum = 0
+    i = 0
     for data in tqdm(train_dataloader, total=len(train_dataloader)):
         # for nbatch, data in enumerate(train_dataloader):
-
+        i += 1
         optimizer.zero_grad()
 
         img, _, _, bbox_data, bbox_labels = data

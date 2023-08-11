@@ -1,6 +1,8 @@
+from pathlib import Path
 
 import cv2
 import numpy as np
+import torch
 import torchvision.transforms.functional as F
 
 
@@ -15,7 +17,6 @@ class SquarePad:
 
 
 def draw_bboxes(prediction, original, use_padding=True):
-
     if isinstance(original, str):
         original = cv2.imread(original)
 
@@ -40,7 +41,6 @@ def draw_bboxes(prediction, original, use_padding=True):
         delta_w = 300 - new_w
 
     else:
-
         orig_h, orig_w = original.shape[0], original.shape[1]
         delta_h = 0
         delta_w = 0
@@ -61,9 +61,32 @@ def draw_bboxes(prediction, original, use_padding=True):
             cv2.rectangle(original, (x1, y1), (x2, y2),
                           (0, 0, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(original, "person", (x1, y1 + 20),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 25, 255), 2)
+            cv2.putText(
+                original,
+                "person",
+                (x1, y1 + 20),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1.2,
+                (0, 25, 255),
+                2,
+            )
 
     return original
 
 
+def save_model(
+    model, optimizer=None, model_name="model_name", path="weight",
+    lr_scheduler=None
+):
+    if isinstance(path, str):
+        path = Path(path)
+    path_save_state = path / ("state " + model_name + ".pth")
+    state = {
+        "model_name": model_name,
+        "model_state": model.state_dict(),
+        "optimizer_state": None if optimizer is None else optimizer.state_dict(),
+        "lr_scheduler_state": None
+        if lr_scheduler is None
+        else lr_scheduler.state_dict(),
+    }
+    torch.save(state, path_save_state)

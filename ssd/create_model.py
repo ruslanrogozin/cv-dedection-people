@@ -18,7 +18,6 @@ def nvidia_ssd(
 
     model = ssd.SSD300()
     if torch.cuda.is_available() and device == "cuda":
-        print('cuda')
         model = model.cuda()
 
     if isinstance(path, str):
@@ -39,7 +38,7 @@ def nvidia_ssd(
         if not torch.cuda.is_available() or device == "cpu":
             ckpt = torch.load(path_to_model, map_location=torch.device("cpu"))
         elif device == "cuda" and torch.cuda.is_available():
-            print('load cuda')
+
             ckpt = torch.load(path_to_model)
 
         ckpt = ckpt["model"]
