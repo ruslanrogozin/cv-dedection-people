@@ -160,7 +160,7 @@ class SSDTransformer(object):
     def dboxes(self):
         return self.dboxes_
 
-    def __call__(self, img, img_size, bbox=None, label=None, max_num=200):
+    def __call__(self, img, img_size, bbox=None, label=None, max_num=500):
         # img = torch.tensor(img)
         if self.val:
             bbox_out = torch.zeros(max_num, 4)

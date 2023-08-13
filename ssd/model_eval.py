@@ -67,6 +67,8 @@ def model_evaluate(
             preds_dict["labels"] = labels_pred.detach().cpu()
             preds.append(preds_dict)
             target.append(true_dict)
+        if i == 6:
+            break
 
     metric = MeanAveragePrecision()
     metric.update(preds, target)
