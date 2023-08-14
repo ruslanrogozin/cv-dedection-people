@@ -1,4 +1,5 @@
 class Configs:
+    model_number_classes = 81
     path_data = 'data'
     path_new_data = 'new_data'
     path_weight_model = 'weight'
@@ -7,5 +8,6 @@ class Configs:
     device = 'cpu'
     batch_size = 64
     use_padding_in_image_transform = False#True
+    SSDTransformer_max_num = 1000
     decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.3}
-    use_pick_best_in_eval = True
+    use_pick_best_in_eval = False

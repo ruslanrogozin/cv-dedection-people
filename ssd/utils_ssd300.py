@@ -5,6 +5,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from config.config import Configs
+
 
 # This function is from https://github.com/kuangliu/pytorch-ssd.
 def calc_iou_tensor(box1, box2):
@@ -74,19 +76,26 @@ class Encoder(object):
         self.scale_wh = dboxes.scale_wh
 
     def encode(self, bboxes_in, labels_in, criteria=0.5):
-
         ious = calc_iou_tensor(bboxes_in, self.dboxes)
-        best_dbox_ious, best_dbox_idx = ious.max(dim=0)# выдает номера (строк) ббох, которые набилее юлизки к якорным, массив размера 8732
-        best_bbox_ious, best_bbox_idx = ious.max(dim=1) # номер (столбцов) якорных ббх, близких к переданным размер массива 19
+        best_dbox_ious, best_dbox_idx = ious.max(
+            dim=0
+        )  # выдает номера (строк) ббох, которые набилее юлизки к якорным, массив размера 8732
+        best_bbox_ious, best_bbox_idx = ious.max(
+            dim=1
+        )  # номер (столбцов) якорных ббх, близких к переданным размер массива 19
 
-        #best_bbox_idx = номера столбцов, в которых максимум для каждой из строк!!!! т.е. первое число - максимум в первой строке
+        # best_bbox_idx = номера столбцов, в которых максимум для каждой из строк!!!! т.е. первое число - максимум в первой строке
 
         # помещаем максимум ious = 2  на те позиции строк, для которых axis =1 имеет максимум
         # set best ious 2.0
-        best_dbox_ious.index_fill_(0, best_bbox_idx, 2.0)# т.к. для каждой строки мы нашли максимум, то необходимо положить номера строк в правильном порядке
+        best_dbox_ious.index_fill_(
+            0, best_bbox_idx, 2.0
+        )  # т.к. для каждой строки мы нашли максимум, то необходимо положить номера строк в правильном порядке
 
         idx = torch.arange(0, best_bbox_idx.size(0), dtype=torch.int64)
-        best_dbox_idx[best_bbox_idx[idx]] = idx #  максимумы искали для каждой из строк!!!! т.е. первое число - максимум в первой строке
+        best_dbox_idx[
+            best_bbox_idx[idx]
+        ] = idx  #  максимумы искали для каждой из строк!!!! т.е. первое число - максимум в первой строке
 
         # filter IoU > 0.5
         masks = best_dbox_ious > criteria
@@ -125,7 +134,10 @@ class Encoder(object):
         bboxes_in[:, :, :2] = self.scale_xy * bboxes_in[:, :, :2]
         bboxes_in[:, :, 2:] = self.scale_wh * bboxes_in[:, :, 2:]
 
-        bboxes_in[:, :, :2] = bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:] + self.dboxes_xywh[:, :, :2]
+        bboxes_in[:, :, :2] = (
+            bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:]
+            + self.dboxes_xywh[:, :, :2]
+        )
         bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * self.dboxes_xywh[:, :, 2:]
 
         # Transform format to ltrb
@@ -143,12 +155,20 @@ class Encoder(object):
 
         return bboxes_in, F.softmax(scores_in, dim=-1)
 
-    def decode_batch(self, bboxes_in, scores_in, criteria=0.5, max_output=200):
+    def decode_batch(
+        self,
+        bboxes_in,
+        scores_in,
+        criteria=Configs.decode_result["criteria"],
+        max_output=Configs.decode_result["max_output"],
+    ):
         # scores input [N, 81, 8732]
         bboxes, probs = self.scale_back_batch(bboxes_in, scores_in)
         # scores input [N,  8732 ,81]
         output = []
-        for bbox, prob in zip(bboxes.split(1, 0), probs.split(1, 0)):  # iterate over batches
+        for bbox, prob in zip(
+            bboxes.split(1, 0), probs.split(1, 0)
+        ):  # iterate over batches
             bbox = bbox.squeeze(0)  # [1, 8732,4]) -> [ 8732, 4])
             prob = prob.squeeze(0)  # [1, 8732, 81] -> [ 8732, 81]
             output.append(self.decode_single(bbox, prob, criteria, max_output))
@@ -221,7 +241,6 @@ class DefaultBoxes(object):
         scale_xy=0.1,
         scale_wh=0.2,
     ):
-
         self.feat_size = feat_size
         self.fig_size = fig_size
 
@@ -239,7 +258,6 @@ class DefaultBoxes(object):
         self.default_boxes = []  # (8732, 4);
         # size of feature and number of feature
         for idx, sfeat in enumerate(self.feat_size):
-
             sk1 = scales[idx] / fig_size
             sk2 = scales[idx + 1] / fig_size
             sk3 = sqrt(sk1 * sk2)

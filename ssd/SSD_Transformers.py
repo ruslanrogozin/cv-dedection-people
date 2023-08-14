@@ -4,6 +4,7 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
+from config.config import Configs
 from ssd.utils_ssd300 import Encoder, calc_iou_tensor
 
 
@@ -160,7 +161,7 @@ class SSDTransformer(object):
     def dboxes(self):
         return self.dboxes_
 
-    def __call__(self, img, img_size, bbox=None, label=None, max_num=500):
+    def __call__(self, img, img_size, bbox=None, label=None, max_num=Configs.SSDTransformer_max_num):
         # img = torch.tensor(img)
         if self.val:
             bbox_out = torch.zeros(max_num, 4)

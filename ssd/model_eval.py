@@ -20,12 +20,7 @@ def model_evaluate(
         img, _, images_sizes, bbox_data, bbox_labels = data
         with torch.no_grad():
             ploc, plabel = model(img.to(device))
-            detections = encoder.decode_batch(
-                ploc,
-                plabel,
-                Configs.decode_result["criteria"],
-                Configs.decode_result["max_output"],
-            )
+            detections = encoder.decode_batch(ploc, plabel)
 
         for idx in range(ploc.shape[0]):
             true_dict = dict()

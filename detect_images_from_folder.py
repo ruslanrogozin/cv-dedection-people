@@ -39,6 +39,9 @@ def detect_images(
 
     for image, file in tqdm(data):
         image = image.unsqueeze(0)
+        if device == "cuda" and torch.cuda.is_available():
+            image = image.cuda()
+
         with torch.no_grad():
             detections = model(image)
 

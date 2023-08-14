@@ -4,7 +4,7 @@ import cv2
 from tqdm import tqdm
 
 from config.config import Configs
-from detect_batch_image import detect_image
+from detect_batch_image_cv2 import detect_image
 
 
 def detect_video(

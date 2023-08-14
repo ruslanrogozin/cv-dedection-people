@@ -1,8 +1,6 @@
 from pathlib import Path
-from ssd.create_model import nvidia_ssd
+
 from config.config import Configs
-from detect_images import detect_images
-from detect_video import detect_video
 
 
 def main():
