@@ -1,5 +1,6 @@
 class Configs:
     model_number_classes = 81
+    random_seed = 0
     path_data = 'data'
     path_new_data = 'new_data'
     path_weight_model = 'weight'

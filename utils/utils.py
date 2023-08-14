@@ -1,9 +1,24 @@
+import os
+import random
 from pathlib import Path
 
 import cv2
 import numpy as np
 import torch
 import torchvision.transforms.functional as F
+
+from config.config import Configs
+
+
+def set_seed(seed=Configs.random_seed):
+    """Делает наши результаты воспроизводимыми (вычисления могут немного больше времени занимать)"""
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(seed)
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
 
 
 class SquarePad:
@@ -58,8 +73,7 @@ def draw_bboxes(prediction, original, use_padding=True):
             x1, y1 = int((x1 / 300) * orig_w), int((y1 / 300) * orig_h)
             x2, y2 = int((x2 / 300) * orig_w), int((y2 / 300) * orig_h)
             # draw the bounding boxes around the objects
-            cv2.rectangle(original, (x1, y1), (x2, y2),
-                          (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.rectangle(original, (x1, y1), (x2, y2), (0, 0, 255), 2, cv2.LINE_AA)
 
             cv2.putText(
                 original,
@@ -75,8 +89,7 @@ def draw_bboxes(prediction, original, use_padding=True):
 
 
 def save_model(
-    model, optimizer=None, model_name="model_name", path="weight",
-    lr_scheduler=None
+    model, optimizer=None, model_name="model_name", path="weight", lr_scheduler=None
 ):
     if isinstance(path, str):
         path = Path(path)

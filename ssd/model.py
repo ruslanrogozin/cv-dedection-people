@@ -35,7 +35,9 @@ class ResNet(nn.Module):
 
 
 class SSD300(nn.Module):
-    def __init__(self, backbone=ResNet("resnet50"), label_num  = Configs.model_number_classes):
+    def __init__(
+        self, backbone=ResNet("resnet50"), label_num=Configs.model_number_classes
+    ):
         super().__init__()
         self.feature_extractor = backbone
 
@@ -81,8 +83,7 @@ class SSD300(nn.Module):
                     nn.Conv2d(input_size, channels, kernel_size=1, bias=False),
                     nn.BatchNorm2d(channels),
                     nn.ReLU(inplace=True),
-                    nn.Conv2d(channels, output_size,
-                              kernel_size=3, bias=False),
+                    nn.Conv2d(channels, output_size, kernel_size=3, bias=False),
                     nn.BatchNorm2d(output_size),
                     nn.ReLU(inplace=True),
                 )
@@ -109,8 +110,7 @@ class SSD300(nn.Module):
             )
 
         locs, confs = list(zip(*ret))
-        locs, confs = torch.cat(locs, 2).contiguous(
-        ), torch.cat(confs, 2).contiguous()
+        locs, confs = torch.cat(locs, 2).contiguous(), torch.cat(confs, 2).contiguous()
         return locs, confs
 
     def forward(self, x):
@@ -130,42 +130,48 @@ class SSD300(nn.Module):
 
 class Loss(nn.Module):
     """
-        Implements the loss as the sum of the followings:
-        1. Confidence Loss: All labels, with hard negative mining
-        2. Localization Loss: Only on positive labels
-        Suppose input dboxes has the shape 8732x4
+    Implements the loss as the sum of the followings:
+    1. Confidence Loss: All labels, with hard negative mining
+    2. Localization Loss: Only on positive labels
+    Suppose input dboxes has the shape 8732x4
     """
 
     def __init__(self, dboxes, device=Configs.device):
         super(Loss, self).__init__()
-        self.scale_xy = 1.0/dboxes.scale_xy
-        self.scale_wh = 1.0/dboxes.scale_wh
+        self.scale_xy = 1.0 / dboxes.scale_xy
+        self.scale_wh = 1.0 / dboxes.scale_wh
         self.device = device
-        self.sl1_loss = nn.SmoothL1Loss(reduction='none')
-        self.dboxes = nn.Parameter(dboxes(order="xywh").transpose(0, 1).unsqueeze(dim=0),
-                                   requires_grad=False).to(device)
-
+        self.sl1_loss = nn.SmoothL1Loss(reduction="none")
+        self.dboxes = nn.Parameter(
+            dboxes(order="xywh").transpose(0, 1).unsqueeze(dim=0), requires_grad=False
+        ).to(device)
 
         # Two factor are from following links
         # http://jany.st/post/2017-11-05-single-shot-detector-ssd-from-scratch-in-tensorflow.html
-        self.con_loss = nn.CrossEntropyLoss(reduction='none')
+        self.con_loss = nn.CrossEntropyLoss(reduction="none")
 
     def _loc_vec(self, loc):
         """
-            Generate Location Vectors
+        Generate Location Vectors
         """
-        gxy = self.scale_xy * \
-            (loc[:, :2, :] - self.dboxes[:, :2, :])/self.dboxes[:, 2:, ]
-        gwh = self.scale_wh*(loc[:, 2:, :]/self.dboxes[:, 2:, :]).log()
+        gxy = (
+            self.scale_xy
+            * (loc[:, :2, :] - self.dboxes[:, :2, :])
+            / self.dboxes[
+                :,
+                2:,
+            ]
+        )
+        gwh = self.scale_wh * (loc[:, 2:, :] / self.dboxes[:, 2:, :]).log()
         return torch.cat((gxy, gwh), dim=1).contiguous()
 
     def forward(self, ploc, plabel, gloc, glabel):
         """
-            ploc, plabel: Nx4x8732, Nxlabel_numx8732
-                predicted location and labels
+        ploc, plabel: Nx4x8732, Nxlabel_numx8732
+            predicted location and labels
 
-            gloc, glabel: Nx4x8732, Nx8732
-                ground truth location and labels
+        gloc, glabel: Nx4x8732, Nx8732
+            ground truth location and labels
         """
         mask = glabel > 0
         pos_num = mask.sum(dim=1)
@@ -174,7 +180,7 @@ class Loss(nn.Module):
 
         # sum on four coordinates, and mask
         sl1 = self.sl1_loss(ploc, vec_gd).sum(dim=1)
-        sl1 = (mask.float()*sl1).sum(dim=1)
+        sl1 = (mask.float() * sl1).sum(dim=1)
 
         # hard negative mining
         con = self.con_loss(plabel, glabel)
@@ -186,15 +192,15 @@ class Loss(nn.Module):
         _, con_rank = con_idx.sort(dim=1)
 
         # number of negative three times positive
-        neg_num = torch.clamp(3*pos_num, max=mask.size(1)).unsqueeze(-1)
+        neg_num = torch.clamp(3 * pos_num, max=mask.size(1)).unsqueeze(-1)
         neg_mask = con_rank < neg_num
 
         # print(con.shape, mask.shape, neg_mask.shape)
-        closs = (con*((mask + neg_mask).float())).sum(dim=1)
+        closs = (con * ((mask + neg_mask).float())).sum(dim=1)
 
         # avoid no object detected
         total_loss = sl1 + closs
         num_mask = (pos_num > 0).float()
         pos_num = pos_num.float().clamp(min=1e-6)
-        ret = (total_loss*num_mask/pos_num).mean(dim=0)
+        ret = (total_loss * num_mask / pos_num).mean(dim=0)
         return ret

@@ -15,23 +15,21 @@ def main():
         pretrained_default=True,
         pretrainded_custom=False,
         path=work_directory / "weight",
-        device='cuda'
-
+        device="cuda",
     )
-
 
     model.eval()
 
     detect_images(
         model=model,
-        device='cuda',
+        device="cuda",
         path_to_data=work_directory / "data",
         path_new_data=work_directory / "new_data",
     )
 
     detect_video(
         model=model,
-        device='cuda',
+        device="cuda",
         path_to_data=work_directory / "data",
         path_new_data=work_directory / "new_data",
     )
