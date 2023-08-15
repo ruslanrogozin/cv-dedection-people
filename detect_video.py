@@ -16,6 +16,8 @@ def detect_video(
     criteria_iou=Configs.decode_result["criteria"],
     max_output_iou=Configs.decode_result["max_output"],
     prob_threshold=Configs.decode_result["pic_threshold"],
+    use_head=Configs.use_head,
+    use_padding_in_transform=Configs.use_padding_in_image_transform,
 ):
     print("run detect video")
     model.eval()
@@ -78,6 +80,8 @@ def detect_video(
                     criteria_iou=criteria_iou,
                     max_output_iou=max_output_iou,
                     prob_threshold=prob_threshold,
+                    use_padding_in_transform=use_padding_in_transform,
+                    use_head=use_head,
                 )
                 for new_image in new_images:
                     out.write(new_image)

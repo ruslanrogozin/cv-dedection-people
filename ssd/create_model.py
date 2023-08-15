@@ -12,11 +12,12 @@ def nvidia_ssd(
     pretrainded_custom=False,
     path=Configs.path_weight_model,
     device=Configs.device,
+    label_num=81,
 ):
     """Constructs an SSD300 model."""
     from . import model as ssd
 
-    model = ssd.SSD300()
+    model = ssd.SSD300(label_num=label_num)
     if torch.cuda.is_available() and device == "cuda":
         model = model.cuda()
 
@@ -32,13 +33,13 @@ def nvidia_ssd(
                 print("---loading model weights and saving to ssd folder--- ")
                 urllib.request.urlretrieve(checkpoint, path_to_model)
                 print("---loading model complete--- ")
+
         elif pretrainded_custom:
             path_to_model = path
 
         if not torch.cuda.is_available() or device == "cpu":
             ckpt = torch.load(path_to_model, map_location=torch.device("cpu"))
         elif device == "cuda" and torch.cuda.is_available():
-
             ckpt = torch.load(path_to_model)
 
         ckpt = ckpt["model"]

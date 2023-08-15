@@ -175,7 +175,14 @@ class Encoder(object):
         return output
 
     # perform non-maximum suppression
-    def decode_single(self, bboxes_in, scores_in, criteria, max_output, max_num=200):
+    def decode_single(
+        self,
+        bboxes_in,
+        scores_in,
+        criteria,
+        max_output,
+        max_num=Configs.decode_single_max_num,
+    ):
         # Reference to https://github.com/amdegroot/ssd.pytorch
 
         bboxes_out = []

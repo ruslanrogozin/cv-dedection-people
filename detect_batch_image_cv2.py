@@ -5,7 +5,7 @@ from torchvision import transforms
 
 from config.config import Configs
 from ssd.decode_results import Processing as processing
-from utils.utils import draw_bboxes
+from utils.utils import SquarePad, draw_bboxes
 
 
 def detect_image(
@@ -14,7 +14,9 @@ def detect_image(
     device=Configs.device,
     criteria_iou=Configs.decode_result["criteria"],
     max_output_iou=Configs.decode_result["max_output"],
-    prob_threshold=Configs.decode_result["pic_threshold"]
+    prob_threshold=Configs.decode_result["pic_threshold"],
+    use_padding_in_transform=Configs.use_padding_in_image_transform,
+    use_head=Configs.use_head,
 ):
     inputs = []
     for image in images:
@@ -24,12 +26,10 @@ def detect_image(
 
     transform = transforms.Compose(
         [
-            #SquarePad(),
+            SquarePad(),
             transforms.Resize((300, 300)),
             transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-            ),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
 
@@ -49,7 +49,6 @@ def detect_image(
         max_output=max_output_iou,
     )
 
-
     output = []
 
     for i, results_per_input in enumerate(results_per_inputs):
@@ -61,7 +60,8 @@ def detect_image(
         new_image = draw_bboxes(
             prediction=best_results_per_input,
             original=images[i],
-            use_padding=Configs.use_padding_in_image_transform,
+            use_padding=use_padding_in_transform,
+            use_head=use_head,
         )
         output.append(new_image)
 

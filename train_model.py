@@ -49,11 +49,24 @@ def train_model(
             best_epoch = epoch
             save_model(
                 model=model,
-                optimizer=None,
+                optimizer=optimizer,
                 model_name="best_model_at_" + str(epoch + 1),
                 path=path_to_save,
-                lr_scheduler=None,
+                lr_scheduler=scheduler,
             )
+
+            with open("train_results" + str(epoch + 1) + ".txt", "w") as file_handler:
+                file_handler.write("loss\n")
+                for item in loss_mas:
+                    file_handler.write("{}\t".format(item))
+
+                file_handler.write("\nmap\n")
+                for item in map50:
+                    file_handler.write("{}\t".format(item))
+
+                file_handler.write("\nmap_50\n")
+                for item in map_mas:
+                    file_handler.write("{}\t".format(item))
 
         print(f"Epoch #{epoch+1} train loss: {losses:.3f}")
         print(f"Epoch #{epoch+1} mAP: {metrics_map['map']}")
@@ -67,7 +80,20 @@ def train_model(
         print(f"Took {((end - start) / 60):.3f} minutes for epoch {epoch + 1}")
 
         if scheduler is not None:
-            scheduler.step()
+            scheduler.step(losses)
+            #metrics_map['map'])
+        with open("train_results.txt", "w") as file_handler:
+            file_handler.write("loss\n")
+            for item in loss_mas:
+                file_handler.write("{}\t".format(item))
+
+            file_handler.write("\nmap\n")
+            for item in map50:
+                file_handler.write("{}\t".format(item))
+
+            file_handler.write("\nmap_50\n")
+            for item in map_mas:
+                file_handler.write("{}\t".format(item))
 
     save_model(
         model=model,
@@ -76,16 +102,3 @@ def train_model(
         path=path_to_save,
         lr_scheduler=scheduler,
     )
-
-    with open("train_results.txt", "w") as file_handler:
-        file_handler.write("loss\n")
-        for item in loss_mas:
-            file_handler.write("{}\t".format(item))
-
-        file_handler.write("\nmap\n")
-        for item in map50:
-            file_handler.write("{}\t".format(item))
-
-        file_handler.write("\nmap_50\n")
-        for item in map_mas:
-            file_handler.write("{}\t".format(item))

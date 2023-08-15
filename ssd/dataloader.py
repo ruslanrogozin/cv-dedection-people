@@ -3,6 +3,8 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from utils.utils import SquarePad
+
 
 class ImagesDataset(Dataset):
     """
@@ -32,7 +34,7 @@ class ImagesDataset(Dataset):
 
         self.transform = transforms.Compose(
             [
-                #SquarePad(),
+                SquarePad(),
                 transforms.Resize((300, 300)),
                 transforms.ToTensor(),
                 transforms.Normalize(

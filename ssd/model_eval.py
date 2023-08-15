@@ -11,6 +11,7 @@ def model_evaluate(
     val_dataloader,
     device=Configs.device,
     use_pick_best=Configs.use_pick_best_in_eval,
+    threshold = Configs.decode_result["pic_threshold"]
 ):
     target = []
     preds = []
@@ -29,7 +30,7 @@ def model_evaluate(
 
             if use_pick_best:
                 best_score = (
-                    (detections[idx][2] > Configs.decode_result["pic_threshold"])
+                    (detections[idx][2] > threshold )
                     .detach()
                     .cpu()
                 )
