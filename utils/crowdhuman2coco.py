@@ -12,7 +12,8 @@ class Crowdhuman2coco:
         path_to_data,
         path_to_new_data,
         path_to_json,
-        number_images,
+        im_start=0,
+        number_images=100,
     ):
         if isinstance(path_to_annotation, str):
             path_to_annotation = Path(path_to_annotation)
@@ -31,6 +32,7 @@ class Crowdhuman2coco:
         self.path_to_json = path_to_json
 
         self.number_images = number_images
+        self.im_start = im_start
 
         path_to_new_data.mkdir(parents=True, exist_ok=True)
 
@@ -59,7 +61,10 @@ class Crowdhuman2coco:
         print("start convert")
         pbar = tqdm(total=self.number_images)
         count_save = 0
-        for _, image_dict in enumerate(records):
+        for i, image_dict in enumerate(records):
+            if i < self.im_start:
+                #print(i)
+                continue
             file_name = image_dict["ID"] + ".jpg"
             img = Image.open(self.path_to_data / file_name)
 
