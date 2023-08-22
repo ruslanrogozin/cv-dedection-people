@@ -8,9 +8,9 @@ class Configs:
     path_to_save_state_model = 'weight'
     device = 'cpu'
     batch_size = 64
-    use_padding_in_image_transform = True
+    use_padding_in_image_transform = False
     use_head = True
     SSDTransformer_max_num = 1000
     decode_single_max_num = 200
-    decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.3}
+    decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.25}
     use_pick_best_in_eval = False

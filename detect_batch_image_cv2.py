@@ -5,7 +5,7 @@ from torchvision import transforms
 
 from config.config import Configs
 from ssd.decode_results import Processing as processing
-from utils.utils import SquarePad, draw_bboxes
+from utils.utils import draw_bboxes  # SquarePad,
 
 
 def detect_image(
@@ -26,7 +26,7 @@ def detect_image(
 
     transform = transforms.Compose(
         [
-            SquarePad(),
+            #SquarePad(),
             transforms.Resize((300, 300)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),

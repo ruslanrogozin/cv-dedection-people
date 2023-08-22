@@ -18,6 +18,7 @@ def detect_images(
     criteria_iou=Configs.decode_result["criteria"],
     max_output_iou=Configs.decode_result["max_output"],
     prob_threshold=Configs.decode_result["pic_threshold"],
+    use_head=Configs.use_head,
 ):
     print("run detect images")
     model.eval()
@@ -60,6 +61,7 @@ def detect_images(
             prediction=best_results_per_input,
             original=file,
             use_padding=Configs.use_padding_in_image_transform,
+            use_head=use_head
         )
 
         orginal_name = file.name

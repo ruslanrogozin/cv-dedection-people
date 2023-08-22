@@ -12,7 +12,7 @@ def nvidia_ssd(
     pretrainded_custom=False,
     path=Configs.path_weight_model,
     device=Configs.device,
-    label_num=81,
+    label_num=Configs.model_number_classes,
 ):
     """Constructs an SSD300 model."""
     from . import model as ssd
