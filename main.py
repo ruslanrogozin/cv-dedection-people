@@ -15,7 +15,7 @@ def main():
         pretrained_default=False,
         pretrainded_custom=True,
         path=work_directory / "weight\\state best_model_at_adam2.pth",
-        device="cuda",
+        device="cpu",
         label_num=3
     )
 
@@ -23,7 +23,7 @@ def main():
 
     detect_images(
         model=model,
-        device="cuda",
+        device="cpu",
         path_to_data=work_directory / "data",
         path_new_data=work_directory / "new_data",
         prob_threshold=0.25,
@@ -32,7 +32,7 @@ def main():
 
     detect_video(
         model=model,
-        device="cuda",
+        device="cpu",
         path_to_data=work_directory / "data",
         path_new_data=work_directory / "new_data",
         prob_threshold=0.3,
