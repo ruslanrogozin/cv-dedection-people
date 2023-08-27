@@ -9,7 +9,7 @@ class Configs:
     device = 'cpu'
     batch_size = 64
     use_padding_in_image_transform = False
-    use_head = True
+    use_head = False
     SSDTransformer_max_num = 1000
     decode_single_max_num = 200
     decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.25}
