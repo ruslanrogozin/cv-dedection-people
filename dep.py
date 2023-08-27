@@ -83,7 +83,7 @@ def edit_person(
     return {"status": "default model"}
 
 
-@app.put("/model/info")
+@app.get("/model/info")
 def get_model_info():
     return {
         "pretrained_default": detection.pretrained_default,
