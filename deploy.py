@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 
 from config.config import Configs
 from detect_images_from_folder import detect_images
+from detect_video import detect_video
 from Detection_model import Detection_model
 from ssd.create_model import nvidia_ssd
 
@@ -38,6 +39,36 @@ async def detect_image_from_folder(
     ans = detect_images(
         model=detection.model,
         device=detection.device,
+        path_to_data=path_to_data,
+        criteria_iou=criteria_iou,
+        max_output_iou=max_output_iou,
+        prob_threshold=prob_threshold,
+        use_head=detection.use_head,
+    )
+
+    return ans
+
+
+@app.post("/detect_video_from_folder/{path_to_data}")
+async def detect_video_from_folder(
+    path_to_data: str,
+    batch_size: Annotated[
+        int, Path(title="batch_size", gt=0)
+    ] = Configs.batch_size,
+    criteria_iou: Annotated[
+        float, Path(title="riteria_iou", gt=0, le=1)
+    ] = Configs.decode_result["criteria"],
+    max_output_iou: Annotated[
+        int, Path(title="max_output_iou", gt=0)
+    ] = Configs.decode_result["max_output"],
+    prob_threshold: Annotated[
+        float, Path(title="prob_threshold", ge=0, le=1)
+    ] = Configs.decode_result["pic_threshold"],
+):
+    ans = detect_video(
+        model=detection.model,
+        device=detection.device,
+        batch_size=batch_size,
         path_to_data=path_to_data,
         criteria_iou=criteria_iou,
         max_output_iou=max_output_iou,
