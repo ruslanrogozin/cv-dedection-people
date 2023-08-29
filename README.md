@@ -34,6 +34,7 @@ repository
     │       └── create_model.py       # функция загрузки весов и создания модели
     │       └── dataloader.py         # реализован класс, выполняющий чтение и преподработку всех изображений
     │       └── decode_results.py     # преобразует выход модели в bbx (используется при оценке качества модели, а также при детекции)
+    │       └── Detection_model.py    # обертка модели в класс, содержащий доп. информацию, необходимую для deploy
     │       └── loader_coco.py        # data loader для COCO dataset
     │       └── loader_crowdhuman.py  # data loader для crowdhuman dataset
     │       └── model.py              # код слоев модели, а также функции потерь
@@ -46,11 +47,12 @@ repository
     |       └── example_train_model.ipynb  # ноутбук с примером обучения
     |       └── report.ipynb.ipynb         # отчет по обучению
     └── utils
-    │       └── utils.py                   # Утилитры для модели
+    │       └── utils.py                   # Утилитры для модели, функции для нанесения bbx на изображения или видео
     └── weight                             # Веса модели
 
     │
-    └── detect_batch_image_cv2.py     # детекция изображений, прочитанных cv2 (используется в детекции видео)
+    └── deploy.py                     # обертка в fast api
+    └── detect_batch_image.py         # детекция батча изображений (используется в детекции видео)
     └── detect_images_from_folder.py  # Функция для детектирования всех изображений из папки data
     └── detect_video.py               # Функция для детектирования всех видео из папки data
     └── main.py                       # Запуск детекции

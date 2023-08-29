@@ -6,8 +6,8 @@ from fastapi import FastAPI, HTTPException
 from config.config import Configs
 from detect_images_from_folder import detect_images
 from detect_video import detect_video
-from Detection_model import Detection_model
 from ssd.create_model import nvidia_ssd
+from ssd.Detection_model import Detection_model
 
 detection = Detection_model()
 
