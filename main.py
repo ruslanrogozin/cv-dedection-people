@@ -26,7 +26,12 @@ def main():
         prob_threshold=0.3,
         use_head=True,
     )
-    draw_bboxes_and_save_image(res_img, use_head=True)
+    draw_bboxes_and_save_image(
+        detect_res=res_img,
+        use_head=True,
+        save_image=False,
+        show_image=True,
+    )
 
     res_video = detect_video(
         model=model,

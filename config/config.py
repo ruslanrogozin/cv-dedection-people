@@ -14,3 +14,5 @@ class Configs:
     decode_single_max_num = 200
     decode_result = {"criteria": 0.5, "max_output": 200, "pic_threshold": 0.25}
     use_pick_best_in_eval = False
+    show_image = False
+    save_image = True

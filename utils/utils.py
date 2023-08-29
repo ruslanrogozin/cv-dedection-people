@@ -90,66 +90,88 @@ def get_bboxes(
     return bbx_detection
 
 
+def draw_bboxes_one_image(
+    prediction,
+    original,
+    use_head=Configs.use_head,
+):
+    if isinstance(original, str):
+        original = cv2.imread(original)
+
+    elif isinstance(original, np.ndarray):
+        original = original.copy()
+
+    else:
+        original = cv2.imread(str(original))
+
+    info = {"person": (0, 0, 255), "head": (0, 255, 0)}
+
+    bbx_ps = prediction["person"]
+    for bbx_p in bbx_ps:
+        x1, y1, x2, y2 = bbx_p
+
+        cv2.rectangle(
+            original, (x1, y1), (x2, y2), info["person"], 2, cv2.LINE_AA
+        )
+        cv2.putText(
+            original,
+            "person",
+            (x1, y1 + 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            info["person"],
+            1,
+        )
+    if use_head and prediction["head"]:
+        bbx_hs = prediction["head"]
+        for bbx_h in bbx_hs:
+            x1, y1, x2, y2 = bbx_h
+            cv2.rectangle(
+                original, (x1, y1), (x2, y2), info["head"], 2, cv2.LINE_AA
+            )
+            cv2.putText(
+                original,
+                "head",
+                (x1, y1 + 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                info["head"],
+                1,
+            )
+
+    return original
+
+
 def draw_bboxes_and_save_image(
     detect_res,
     path_new_data=Configs.path_new_data,
     use_head=Configs.use_head,
+    save_image=False,
+    show_image=False,
 ):
     if detect_res == "no images found!":
         print("no images found!")
         return "no images found!"
+    if save_image:
+        if isinstance(path_new_data, str):
+            path_new_data = Path(path_new_data)
 
-    if isinstance(path_new_data, str):
-        path_new_data = Path(path_new_data)
-    path_new_data.mkdir(parents=True, exist_ok=True)
+        path_new_data.mkdir(parents=True, exist_ok=True)
 
-    info = {"person": (0, 0, 255), "head": (0, 255, 0)}
     for img in detect_res.keys():
-        if isinstance(img, str):
-            original = cv2.imread(img)
-
-        elif isinstance(img, np.ndarray):
-            original = img.copy()
-
-        else:
-            original = cv2.imread(str(img))
-
-        bbx_ps = detect_res[img]["person"]
-        for bbx_p in bbx_ps:
-            x1, y1, x2, y2 = bbx_p
-
-            cv2.rectangle(
-                original, (x1, y1), (x2, y2), info["person"], 2, cv2.LINE_AA
-            )
-            cv2.putText(
-                original,
-                "person",
-                (x1, y1 + 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                info["person"],
-                1,
-            )
-        if use_head and detect_res[img]["head"]:
-            bbx_hs = detect_res[img]["head"]
-            for bbx_h in bbx_hs:
-                x1, y1, x2, y2 = bbx_h
-                cv2.rectangle(
-                    original, (x1, y1), (x2, y2), info["head"], 2, cv2.LINE_AA
-                )
-                cv2.putText(
-                    original,
-                    "head",
-                    (x1, y1 + 10),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    info["head"],
-                    1,
-                )
-
+        new_image = draw_bboxes_one_image(
+            prediction=detect_res[img], original=img, use_head=use_head
+        )
         orginal_name = img.name
-        path_save_image = path_new_data / ("new_" + orginal_name)
-        cv2.imwrite(str(path_save_image), original)
+
+        if save_image:
+            path_save_image = path_new_data / ("new_" + orginal_name)
+            cv2.imwrite(str(path_save_image), new_image)
+        if show_image:
+            cv2.imshow(orginal_name, new_image)
+            cv2.waitKey(0)
+
+    cv2.destroyAllWindows()
 
 
 def draw_boxes_and_save_video(
@@ -219,58 +241,6 @@ def draw_boxes_and_save_video(
         out.release()
         pbar.close()
         cv2.destroyAllWindows()
-
-
-def draw_bboxes_one_image(
-    prediction,
-    original,
-    use_head=Configs.use_head,
-):
-    if isinstance(original, str):
-        original = cv2.imread(original)
-
-    elif isinstance(original, np.ndarray):
-        original = original.copy()
-
-    else:
-        original = cv2.imread(str(original))
-
-    info = {"person": (0, 0, 255), "head": (0, 255, 0)}
-
-    bbx_ps = prediction["person"]
-    for bbx_p in bbx_ps:
-        x1, y1, x2, y2 = bbx_p
-
-        cv2.rectangle(
-            original, (x1, y1), (x2, y2), info["person"], 2, cv2.LINE_AA
-        )
-        cv2.putText(
-            original,
-            "person",
-            (x1, y1 + 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            info["person"],
-            1,
-        )
-    if use_head and prediction["head"]:
-        bbx_hs = prediction["head"]
-        for bbx_h in bbx_hs:
-            x1, y1, x2, y2 = bbx_h
-            cv2.rectangle(
-                original, (x1, y1), (x2, y2), info["head"], 2, cv2.LINE_AA
-            )
-            cv2.putText(
-                original,
-                "head",
-                (x1, y1 + 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                info["head"],
-                1,
-            )
-
-    return original
 
 
 def save_model(
