@@ -4,10 +4,11 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException
 
 from config.config import Configs
-from Detection import Detection
+from detect_images_from_folder import detect_images
+from Detection_model import Detection_model
 from ssd.create_model import nvidia_ssd
 
-detection = Detection()
+detection = Detection_model()
 
 app = FastAPI(
     title="Detection people with ssd300",
@@ -18,12 +19,7 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     print("Server started ")
-    app.package = {"model": detection.model}
-
-
-@app.post("/users/{user_id}")
-def change_user_name(user_id: int):
-    return {"status": 200, "data": app.package["model"]}
+    # app.package = {"model": detection.model}
 
 
 @app.post("/dect_from_folder/{path_to_data}")
@@ -39,11 +35,14 @@ async def detect_image_from_folder(
         float, Path(title="prob_threshold", ge=0, le=1)
     ] = Configs.decode_result["pic_threshold"],
 ):
-    ans = detection.detect_image_from_folder(
+    ans = detect_images(
+        model=detection.model,
+        device=detection.device,
         path_to_data=path_to_data,
         criteria_iou=criteria_iou,
         max_output_iou=max_output_iou,
         prob_threshold=prob_threshold,
+        use_head=detection.use_head,
     )
 
     return ans
@@ -55,7 +54,7 @@ def edit_person(
     pretrainded_custom: bool = False,
     weight: str = "",
     device: str = "cpu",
-    use_head : bool = False
+    use_head: bool = False,
 ):
     if pretrained_default:
         detection.pretrained_default = True
