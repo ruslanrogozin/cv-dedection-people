@@ -22,7 +22,7 @@ async def startup_event():
     # app.package = {"model": detection.model}
 
 
-@app.post("/dect_from_folder/{path_to_data}")
+@app.post("/detect_images_from_folder/{path_to_data}")
 async def detect_image_from_folder(
     path_to_data: str,
     criteria_iou: Annotated[

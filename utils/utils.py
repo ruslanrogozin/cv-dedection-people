@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import torch
 import torchvision.transforms.functional as F
+from tqdm import tqdm
 
 from config.config import Configs
 
@@ -57,7 +58,6 @@ def get_bboxes(
         new_shape = (300, 300)
         ratio = float(max(new_shape)) / max(original_shape)
         new_size = tuple([int(x * ratio) for x in original_shape])
-        # original  = cv2.resize(original, new_size)
         new_h, new_w = new_size
         delta_h = 300 - new_h
         delta_w = 300 - new_w
@@ -90,24 +90,30 @@ def get_bboxes(
     return bbx_detection
 
 
-def draw_bboxes_and_save(
+def draw_bboxes_and_save_image(
     detect_res,
-    save_image=False,
     path_new_data=Configs.path_new_data,
-    use_head=False,
+    use_head=Configs.use_head,
 ):
     if detect_res == "no images found!":
         print("no images found!")
         return "no images found!"
-    if save_image:
-        if isinstance(path_new_data, str):
-            path_new_data = Path(path_new_data)
-        path_new_data.mkdir(parents=True, exist_ok=True)
+
+    if isinstance(path_new_data, str):
+        path_new_data = Path(path_new_data)
+    path_new_data.mkdir(parents=True, exist_ok=True)
 
     info = {"person": (0, 0, 255), "head": (0, 255, 0)}
-
     for img in detect_res.keys():
-        original = cv2.imread(str(img))
+        if isinstance(img, str):
+            original = cv2.imread(img)
+
+        elif isinstance(img, np.ndarray):
+            original = img.copy()
+
+        else:
+            original = cv2.imread(str(img))
+
         bbx_ps = detect_res[img]["person"]
         for bbx_p in bbx_ps:
             x1, y1, x2, y2 = bbx_p
@@ -140,16 +146,84 @@ def draw_bboxes_and_save(
                     info["head"],
                     1,
                 )
-        if save_image:
-            orginal_name = img.name
-            path_save_image = path_new_data / ("new_" + orginal_name)
-            cv2.imwrite(str(path_save_image), original)
+
+        orginal_name = img.name
+        path_save_image = path_new_data / ("new_" + orginal_name)
+        cv2.imwrite(str(path_save_image), original)
 
 
-def draw_bboxes(
+def draw_boxes_and_save_video(
+    detect_res, path_new_data=Configs.path_new_data, use_head=Configs.use_head
+):
+    if detect_res == "no video found":
+        print("no video found")
+        return "no video found"
+    if isinstance(path_new_data, str):
+        path_new_data = Path(path_new_data)
+    path_new_data.mkdir(parents=True, exist_ok=True)
+    print("run print bbx on video")
+    batch_size = detect_res["batch_size"]
+    videos = [video for video in detect_res.keys() if video != "batch_size"]
+    for video in videos:
+        orginal_name = video.name
+        orginal_name = orginal_name.rsplit(".", 1)[0]
+        path_save_video = path_new_data / ("new_" + orginal_name + ".avi")
+
+        cap = cv2.VideoCapture(str(video))
+        fps = cap.get(cv2.CAP_PROP_FPS)  # fps
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        f_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        f_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        fourcc = cv2.VideoWriter_fourcc(*"XVID")
+        out = cv2.VideoWriter(
+            str(path_save_video), fourcc, fps, (f_width, f_height)
+        )
+        batch_number = total_frames // batch_size + int(
+            (total_frames % batch_size) > 0
+        )
+        pbar = tqdm(
+            total=batch_number, desc="extracting frames at fps: {}".format(fps)
+        )
+
+        count = 0
+        batch = []
+        while cap.isOpened():
+            ret, image = cap.read()
+            if not ret:
+                break
+            batch.append(image)
+
+            if (len(batch) == batch_size) or (
+                (total_frames % batch_size == len(batch))
+                and (count == batch_number - 1)
+            ):
+                # get images for batch
+                images = detect_res[video]["batch_" + str(count)]
+                new_images = []
+                for i, img in enumerate(images):
+                    bbx = images[img]
+                    new_image = draw_bboxes_one_image(
+                        prediction=bbx, original=batch[i], use_head=use_head
+                    )
+                    new_images.append(new_image)
+
+                for new_image in new_images:
+                    out.write(new_image)
+
+                batch = []
+                count += 1
+                pbar.update(1)
+
+        cap.release()
+        out.release()
+        pbar.close()
+        cv2.destroyAllWindows()
+
+
+def draw_bboxes_one_image(
     prediction,
     original,
-    use_padding=Configs.use_padding_in_image_transform,
     use_head=Configs.use_head,
 ):
     if isinstance(original, str):
@@ -161,53 +235,40 @@ def draw_bboxes(
     else:
         original = cv2.imread(str(original))
 
-    original_shape = (original.shape[0], original.shape[1])
+    info = {"person": (0, 0, 255), "head": (0, 255, 0)}
 
-    bboxes, classes, _ = prediction
+    bbx_ps = prediction["person"]
+    for bbx_p in bbx_ps:
+        x1, y1, x2, y2 = bbx_p
 
-    if use_padding:
-        orig_h = max(original.shape[0], original.shape[1])
-        orig_w = orig_h
-        # calculate shapes for padding
-        new_shape = (300, 300)
-        ratio = float(max(new_shape)) / max(original_shape)
-        new_size = tuple([int(x * ratio) for x in original_shape])
-        # original  = cv2.resize(original, new_size)
-        new_h, new_w = new_size
-        delta_h = 300 - new_h
-        delta_w = 300 - new_w
-
-    else:
-        orig_h, orig_w = original.shape[0], original.shape[1]
-        delta_h = 0
-        delta_w = 0
-
-    info = {1: [(0, 0, 255), "person"], 2: [(0, 255, 0), "head"]}
-
-    for idx, bbox in enumerate(bboxes):
-        if not use_head and (classes[idx] != 1):
-            continue
-        x1, y1, x2, y2 = bbox
-        # resize the bounding boxes from the normalized to 300 pixels
-        x1, y1 = int(x1 * 300) - delta_w // 2, int(y1 * 300) - delta_h // 2
-        x2, y2 = int(x2 * 300) - delta_w // 2, int(y2 * 300) - delta_h // 2
-        # resizing again to match the original dimensions of the image
-        x1, y1 = int((x1 / 300) * orig_w), int((y1 / 300) * orig_h)
-        x2, y2 = int((x2 / 300) * orig_w), int((y2 / 300) * orig_h)
-        # draw the bounding boxes around the objects
         cv2.rectangle(
-            original, (x1, y1), (x2, y2), info[classes[idx]][0], 2, cv2.LINE_AA
+            original, (x1, y1), (x2, y2), info["person"], 2, cv2.LINE_AA
         )
-
         cv2.putText(
             original,
-            info[classes[idx]][1],
+            "person",
             (x1, y1 + 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
-            info[classes[idx]][0],
+            info["person"],
             1,
         )
+    if use_head and prediction["head"]:
+        bbx_hs = prediction["head"]
+        for bbx_h in bbx_hs:
+            x1, y1, x2, y2 = bbx_h
+            cv2.rectangle(
+                original, (x1, y1), (x2, y2), info["head"], 2, cv2.LINE_AA
+            )
+            cv2.putText(
+                original,
+                "head",
+                (x1, y1 + 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                info["head"],
+                1,
+            )
 
     return original
 
