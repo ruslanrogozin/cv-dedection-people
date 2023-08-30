@@ -1,5 +1,7 @@
+import os
 from io import BytesIO
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Annotated
 
 import cv2
@@ -9,7 +11,7 @@ from PIL import Image
 
 from config.config import Configs
 from detect_images import detect_image_batch, detect_images_from_folder
-from detect_video import detect_video
+from detect_video import detect_one_video, detect_videos_from_folder
 from ssd.create_model import nvidia_ssd
 from ssd.Detection_model import Detection_model
 
@@ -24,7 +26,6 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     print("Server started ")
-    # app.package = {"model": detection.model}
 
 
 def load_image(data):
@@ -32,7 +33,7 @@ def load_image(data):
 
 
 @app.post("/detect_image/")
-async def create_upload_file(
+async def detect_image(
     file: UploadFile = File(...),
     criteria_iou: Annotated[
         float, Path(title="riteria_iou", gt=0, le=1)
@@ -55,6 +56,57 @@ async def create_upload_file(
         prob_threshold=prob_threshold,
         use_head=detection.use_head,
     )["img_num_0"]
+
+
+@app.post("/detect_video/")
+async def detect_video(
+    file: UploadFile = File(...),
+    batch_size: Annotated[
+        int, Path(title="batch_size", gt=0)
+    ] = Configs.batch_size,
+    criteria_iou: Annotated[
+        float, Path(title="riteria_iou", gt=0, le=1)
+    ] = Configs.decode_result["criteria"],
+    max_output_iou: Annotated[
+        int, Path(title="max_output_iou", gt=0)
+    ] = Configs.decode_result["max_output"],
+    prob_threshold: Annotated[
+        float, Path(title="prob_threshold", ge=0, le=1)
+    ] = Configs.decode_result["pic_threshold"],
+):
+    # https://www.reactfix.com/2022/12/fixed-how-to-upload-list-of-videos.html
+    temp = NamedTemporaryFile(delete=False)
+    print("f", file.filename)
+    extension = file.filename.split(".")[-1] in ("mp4", "avi")
+    if not extension:
+        raise HTTPException(
+            status_code=403, detail="Video must be in mp4 or avi format!"
+        )
+    try:
+        try:
+            contents = file.file.read()
+            with temp as f:
+                f.write(contents)
+        except Exception:
+            return {"message": "There was an error uploading the file"}
+        finally:
+            file.file.close()
+        bbx = detect_one_video(
+            model=detection.model,
+            video=temp.name,
+            device=detection.device,
+            batch_size=batch_size,
+            criteria_iou=criteria_iou,
+            max_output_iou=max_output_iou,
+            prob_threshold=prob_threshold,
+        )
+    except Exception:
+        return {"message": "There was an error processing the file"}
+
+    finally:
+        os.remove(temp.name)
+
+    return bbx
 
 
 @app.post("/detect_images_from_folder/{path_to_data}")
@@ -99,7 +151,7 @@ async def detect_video_from_folder(
         float, Path(title="prob_threshold", ge=0, le=1)
     ] = Configs.decode_result["pic_threshold"],
 ):
-    ans = detect_video(
+    ans = detect_videos_from_folder(
         model=detection.model,
         device=detection.device,
         batch_size=batch_size,
@@ -114,7 +166,7 @@ async def detect_video_from_folder(
 
 
 @app.put("/model/")
-def edit_person(
+def set_model(
     pretrained_default: bool = False,
     pretrainded_custom: bool = False,
     weight: str = "",

@@ -1,13 +1,13 @@
 from pathlib import Path
 
 import cv2
-from detect_batch_image import detect_image_batch
 from tqdm import tqdm
 
 from config.config import Configs
+from detect_images import detect_image_batch
 
 
-def detect_video(
+def detect_one_video(
     model,
     video,
     device=Configs.device,
@@ -17,7 +17,6 @@ def detect_video(
     prob_threshold=Configs.decode_result["pic_threshold"],
     use_head=Configs.use_head,
 ):
-    print("run detect video")
     model.eval()
 
     cap = cv2.VideoCapture(video)
@@ -66,7 +65,7 @@ def detect_video(
     return bbx_batch
 
 
-def detect_video_from_folder(
+def detect_videos_from_folder(
     model,
     device=Configs.device,
     path_to_data=Configs.path_data,
@@ -100,7 +99,7 @@ def detect_video_from_folder(
         orginal_name = video.name
         orginal_name = orginal_name.rsplit(".", 1)[0]
 
-        ans[video] = detect_video(
+        ans[video] = detect_one_video(
             model=model,
             video=str(video),
             device=device,
