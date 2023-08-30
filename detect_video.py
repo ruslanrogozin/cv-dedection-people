@@ -94,12 +94,12 @@ def detect_videos_from_folder(
 
     for video in videos:
         print(video)
-        ans[video] = {}
+        ans[str(video)] = {}
 
         orginal_name = video.name
         orginal_name = orginal_name.rsplit(".", 1)[0]
 
-        ans[video] = detect_one_video(
+        ans[str(video)] = detect_one_video(
             model=model,
             video=str(video),
             device=device,

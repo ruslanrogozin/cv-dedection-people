@@ -30,7 +30,7 @@ def main():
         detect_res=res_img,
         use_head=True,
         save_image=False,
-        show_image=True,
+        show_image=False,
     )
 
     res_video = detect_videos_from_folder(

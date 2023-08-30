@@ -190,6 +190,8 @@ def draw_boxes_and_save_video(
     batch_size = detect_res["batch_size"]
     videos = [video for video in detect_res.keys() if video != "batch_size"]
     for video in videos:
+        if isinstance(video, str):
+            video = Path(video)
         orginal_name = video.name
         orginal_name = orginal_name.rsplit(".", 1)[0]
         path_save_video = path_new_data / ("new_" + orginal_name + ".avi")
@@ -224,7 +226,7 @@ def draw_boxes_and_save_video(
                 and (count == batch_number - 1)
             ):
                 # get images for batch
-                images = detect_res[video]["batch_" + str(count)]
+                images = detect_res[str(video)]["batch_" + str(count)]
                 new_images = []
                 for i, img in enumerate(images):
                     bbx = images[img]

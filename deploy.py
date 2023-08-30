@@ -108,7 +108,7 @@ async def detect_video(
     finally:
         os.remove(temp.name)
 
-    return bbx
+    return {"batch_size": batch_size, "bbx": bbx}
 
 
 @app.post("/detect_images_from_folder/{path_to_data}")
@@ -191,6 +191,7 @@ def load_weigth_for_model(
         label_num=label_num,
     )
     model.label_num = label_num
+    model.device = device
     model.weight = file.filename
     model.pretrainded_custom = True
     model.pretrained_default = False
@@ -232,6 +233,46 @@ def get_model_info():
         "label_num": model.label_num,
         "weight": model.weight,
     }
+
+
+def process_video(filename):
+    print("Processing " + filename)
+    cap = cv2.VideoCapture(filename)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow("frame", gray)
+        if cv2.waitKey(1) == ord("q"):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+@app.post("/detect_video_1/")
+async def detect_video_1(file: UploadFile = File(...)):
+    # https://www.reactfix.com/2022/12/fixed-how-to-upload-list-of-videos.html
+    temp = NamedTemporaryFile(delete=False)
+    print("f", file.filename)
+    extension = file.filename.split(".")[-1] in ("mp4", "avi")
+    if not extension:
+        raise HTTPException(
+            status_code=403, detail="Video must be in mp4 or avi format!"
+        )
+    try:
+        contents = file.file.read()
+        with temp as f:
+            f.write(contents)
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
+
+    process_video(temp.name)
+    os.remove(temp.name)
+
+    return 0
 
 
 if __name__ == "__main__":
