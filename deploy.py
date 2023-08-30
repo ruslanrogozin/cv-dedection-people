@@ -1,10 +1,14 @@
+from io import BytesIO
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException
+import cv2
+import numpy as np
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from PIL import Image
 
 from config.config import Configs
-from detect_images_from_folder import detect_images
+from detect_images import detect_image_batch, detect_images_from_folder
 from detect_video import detect_video
 from ssd.create_model import nvidia_ssd
 from ssd.Detection_model import Detection_model
@@ -23,6 +27,36 @@ async def startup_event():
     # app.package = {"model": detection.model}
 
 
+def load_image(data):
+    return Image.open(BytesIO(data))
+
+
+@app.post("/detect_image/")
+async def create_upload_file(
+    file: UploadFile = File(...),
+    criteria_iou: Annotated[
+        float, Path(title="riteria_iou", gt=0, le=1)
+    ] = Configs.decode_result["criteria"],
+    max_output_iou: Annotated[
+        int, Path(title="max_output_iou", gt=0)
+    ] = Configs.decode_result["max_output"],
+    prob_threshold: Annotated[
+        float, Path(title="prob_threshold", ge=0, le=1)
+    ] = Configs.decode_result["pic_threshold"],
+):
+    image = load_image(await file.read())
+    img = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
+
+    return detect_image_batch(
+        model=detection.model,
+        images=[img],
+        criteria_iou=criteria_iou,
+        max_output_iou=max_output_iou,
+        prob_threshold=prob_threshold,
+        use_head=detection.use_head,
+    )["img_num_0"]
+
+
 @app.post("/detect_images_from_folder/{path_to_data}")
 async def detect_image_from_folder(
     path_to_data: str,
@@ -36,7 +70,7 @@ async def detect_image_from_folder(
         float, Path(title="prob_threshold", ge=0, le=1)
     ] = Configs.decode_result["pic_threshold"],
 ):
-    ans = detect_images(
+    ans = detect_images_from_folder(
         model=detection.model,
         device=detection.device,
         path_to_data=path_to_data,

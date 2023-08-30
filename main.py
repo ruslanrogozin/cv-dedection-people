@@ -2,8 +2,8 @@ from pathlib import Path
 
 import torch
 
-from detect_images_from_folder import detect_images
-from detect_video import detect_video
+from detect_images import detect_images_from_folder
+from detect_video import detect_video_from_folder
 from ssd.create_model import nvidia_ssd
 from utils.utils import draw_bboxes_and_save_image, draw_boxes_and_save_video
 
@@ -19,7 +19,7 @@ def main():
         device="cuda",
         label_num=3,
     )
-    res_img = detect_images(
+    res_img = detect_images_from_folder(
         model=model,
         device="cuda",
         path_to_data=work_directory / "data",
@@ -33,7 +33,7 @@ def main():
         show_image=True,
     )
 
-    res_video = detect_video(
+    res_video = detect_video_from_folder(
         model=model,
         device="cuda",
         path_to_data=work_directory / "data",

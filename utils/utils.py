@@ -162,13 +162,16 @@ def draw_bboxes_and_save_image(
         new_image = draw_bboxes_one_image(
             prediction=detect_res[img], original=img, use_head=use_head
         )
+
+        if isinstance(img, str):
+            img = Path(img)
         orginal_name = img.name
 
         if save_image:
             path_save_image = path_new_data / ("new_" + orginal_name)
             cv2.imwrite(str(path_save_image), new_image)
         if show_image:
-            cv2.imshow(orginal_name, new_image)
+            cv2.imshow("1", new_image)
             cv2.waitKey(0)
 
     cv2.destroyAllWindows()
