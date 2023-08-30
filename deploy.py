@@ -7,6 +7,7 @@ from typing import Annotated, Literal
 import cv2
 import numpy as np
 import torch
+import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from PIL import Image
 
@@ -231,3 +232,9 @@ def get_model_info():
         "label_num": model.label_num,
         "weight": model.weight,
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app)
