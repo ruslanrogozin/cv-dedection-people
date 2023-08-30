@@ -2,10 +2,11 @@ import os
 from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Annotated
+from typing import Annotated, Literal
 
 import cv2
 import numpy as np
+import torch
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from PIL import Image
 
@@ -15,7 +16,7 @@ from detect_video import detect_one_video, detect_videos_from_folder
 from ssd.create_model import nvidia_ssd
 from ssd.Detection_model import Detection_model
 
-detection = Detection_model()
+model = Detection_model()
 
 app = FastAPI(
     title="Detection people with ssd300",
@@ -49,12 +50,12 @@ async def detect_image(
     img = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
 
     return detect_image_batch(
-        model=detection.model,
+        model=model.model,
         images=[img],
         criteria_iou=criteria_iou,
         max_output_iou=max_output_iou,
         prob_threshold=prob_threshold,
-        use_head=detection.use_head,
+        use_head=model.use_head,
     )["img_num_0"]
 
 
@@ -92,9 +93,9 @@ async def detect_video(
         finally:
             file.file.close()
         bbx = detect_one_video(
-            model=detection.model,
+            model=model.model,
             video=temp.name,
-            device=detection.device,
+            device=model.device,
             batch_size=batch_size,
             criteria_iou=criteria_iou,
             max_output_iou=max_output_iou,
@@ -123,13 +124,13 @@ async def detect_image_from_folder(
     ] = Configs.decode_result["pic_threshold"],
 ):
     ans = detect_images_from_folder(
-        model=detection.model,
-        device=detection.device,
+        model=model.model,
+        device=model.device,
         path_to_data=path_to_data,
         criteria_iou=criteria_iou,
         max_output_iou=max_output_iou,
         prob_threshold=prob_threshold,
-        use_head=detection.use_head,
+        use_head=model.use_head,
     )
 
     return ans
@@ -152,59 +153,81 @@ async def detect_video_from_folder(
     ] = Configs.decode_result["pic_threshold"],
 ):
     ans = detect_videos_from_folder(
-        model=detection.model,
-        device=detection.device,
+        model=model.model,
+        device=model.device,
         batch_size=batch_size,
         path_to_data=path_to_data,
         criteria_iou=criteria_iou,
         max_output_iou=max_output_iou,
         prob_threshold=prob_threshold,
-        use_head=detection.use_head,
+        use_head=model.use_head,
     )
 
     return ans
 
 
-@app.put("/model/")
-def set_model(
-    pretrained_default: bool = False,
-    pretrainded_custom: bool = False,
-    weight: str = "",
-    device: str = "cpu",
+@app.put("/load_weigth_for_model/")
+def load_weigth_for_model(
+    label_num: Annotated[int, Path(title="batch_size", gt=0)] = 3,
+    device: Literal["cpu", "cuda"] = Configs.device,
+    file: UploadFile = File(...),
+):
+    temp = NamedTemporaryFile(delete=False)
+    try:
+        contents = file.file.read()
+        with temp as f:
+            f.write(contents)
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
+
+    model.model = nvidia_ssd(
+        pretrained_default=False,
+        pretrainded_custom=True,
+        path=temp.name,
+        device=device,
+        label_num=label_num,
+    )
+    model.label_num = label_num
+    model.weight = file.filename
+    model.pretrainded_custom = True
+    model.pretrained_default = False
+
+    return {"status": "set pretrained model"}
+
+
+@app.put("/model_setup/")
+def setup_model(
+    device: Literal["cpu", "cuda"] = Configs.device,
     use_head: bool = False,
 ):
-    if pretrained_default:
-        detection.pretrained_default = True
-        return {"status": "default model"}
-    if pretrainded_custom:
-        work_directory = detection.work_directory
-        if not weight:
-            raise HTTPException(status_code=404, detail="Weight not found!")
-        model = nvidia_ssd(
-            pretrained_default=False,
-            pretrainded_custom=True,
-            path=work_directory / weight,
-            device=device,
-            label_num=3,
-        )
-        detection.model = model
-        detection.device = device
-        detection.pretrained_default = False
-        detection.pretrainded_custom = True
-        detection.label_num = 3
-        detection.weight = weight
-        detection.use_head = use_head
+    if device == "cuda" and torch.cuda.is_available():
+        model.model.cuda()
+        model.device = "cuda"
+    else:
+        device = "cpu"
 
-        return {"status": "set pretrained model"}
-    return {"status": "default model"}
+    if device == "cpu":
+        model.model.to("cpu")
+        model.device = "cpu"
+
+    if use_head and model.pretrainded_custom is True:
+        model.use_head = True
+
+    return {
+        "device": model.device,
+        "use_head": model.use_head,
+        "model_pretrained_default": model.pretrained_default,
+    }
 
 
 @app.get("/model/info")
 def get_model_info():
     return {
-        "pretrained_default": detection.pretrained_default,
-        "pretrainded_custom": detection.pretrainded_custom,
-        "device ": detection.device,
-        "label_num": detection.label_num,
-        "weight": detection.weight,
+        "pretrained_default": model.pretrained_default,
+        "pretrainded_custom": model.pretrainded_custom,
+        "device ": model.device,
+        "label_num": model.label_num,
+        "weight": model.weight,
     }
