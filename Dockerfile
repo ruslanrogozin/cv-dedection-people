@@ -1,6 +1,4 @@
-
 FROM python:3.9
-
 
 # Copy files to the container
 
@@ -25,6 +23,7 @@ COPY ssd/ ssd/
 
 RUN mkdir -p weight
 RUN mkdir -p data
+RUN mkdir -p new_data
 
 EXPOSE 8000
 CMD ["uvicorn", "deploy:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
