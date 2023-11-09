@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from config.config import Configs
+from detection.config.config import Configs
 
 
 # This function is from https://github.com/kuangliu/pytorch-ssd.
@@ -95,7 +95,7 @@ class Encoder(object):
         idx = torch.arange(0, best_bbox_idx.size(0), dtype=torch.int64)
         best_dbox_idx[
             best_bbox_idx[idx]
-        ] = idx  #  максимумы искали для каждой из строк!!!! т.е. первое число - максимум в первой строке
+        ] = idx  # максимумы искали для каждой из строк!!!! т.е. первое число - максимум в первой строке
 
         # filter IoU > 0.5
         masks = best_dbox_ious > criteria
@@ -138,7 +138,8 @@ class Encoder(object):
             bboxes_in[:, :, :2] * self.dboxes_xywh[:, :, 2:]
             + self.dboxes_xywh[:, :, :2]
         )
-        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * self.dboxes_xywh[:, :, 2:]
+        bboxes_in[:, :, 2:] = bboxes_in[:, :, 2:].exp() * \
+            self.dboxes_xywh[:, :, 2:]
 
         # Transform format to ltrb
         l, t, r, b = (
@@ -214,7 +215,8 @@ class Encoder(object):
                 idx = score_idx_sorted[-1].item()
                 bboxes_sorted = bboxes[score_idx_sorted, :]
                 bboxes_idx = bboxes[idx, :].unsqueeze(dim=0)
-                iou_sorted = calc_iou_tensor(bboxes_sorted, bboxes_idx).squeeze()
+                iou_sorted = calc_iou_tensor(
+                    bboxes_sorted, bboxes_idx).squeeze()
                 # we only need iou < criteria
                 score_idx_sorted = score_idx_sorted[iou_sorted < criteria]
                 candidates.append(idx)

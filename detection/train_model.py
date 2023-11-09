@@ -1,9 +1,10 @@
 import time
 
-from config.config import Configs
-from ssd.model_eval import model_evaluate
-from ssd.train_one_loop import train_one_loop
-from utils.utils import save_model
+from configconfig.config import Configs
+
+from detection.ssd.model_eval import model_evaluate
+from detection.ssd.train_one_loop import train_one_loop
+from detection.utils.utils import save_model
 
 
 def train_model(
@@ -71,7 +72,8 @@ def train_model(
         print(f"Epoch #{epoch+1} train loss: {losses:.3f}")
         print(f"Epoch #{epoch+1} mAP: {metrics_map['map']}")
         print(f"Epoch #{epoch+1} mAP_50: {metrics_map['map_50']}")
-        print(f"Epoch #{epoch+1} best mAP: {bes_map} at epoch = {best_epoch + 1 }")
+        print(
+            f"Epoch #{epoch+1} best mAP: {bes_map} at epoch = {best_epoch + 1 }")
 
         loss_mas.append(losses)
         map50.append(metrics_map["map_50"])
@@ -81,7 +83,7 @@ def train_model(
 
         if scheduler is not None:
             scheduler.step(metrics_map["map"])
-            #metrics_map['map'])
+            # metrics_map['map'])
         with open("train_results.txt", "w") as file_handler:
             file_handler.write("loss\n")
             for item in loss_mas:

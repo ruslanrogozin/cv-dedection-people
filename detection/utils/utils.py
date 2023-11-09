@@ -8,7 +8,7 @@ import torch
 import torchvision.transforms.functional as F
 from tqdm import tqdm
 
-from config.config import Configs
+from detection.config.config import Configs
 
 
 def set_seed(seed=Configs.random_seed):

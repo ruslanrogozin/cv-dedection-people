@@ -3,8 +3,8 @@ from pathlib import Path
 import cv2
 from tqdm import tqdm
 
-from config.config import Configs
-from detect_images import detect_image_batch
+from detection.config.config import Configs
+from detection.detect_images import detect_image_batch
 
 
 def detect_one_video(
@@ -23,9 +23,8 @@ def detect_one_video(
     fps = cap.get(cv2.CAP_PROP_FPS)  # fps
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    batch_number = total_frames // batch_size + int(
-        (total_frames % batch_size) > 0
-    )
+    batch_number = total_frames // batch_size + \
+        int((total_frames % batch_size) > 0)
 
     pbar = tqdm(
         total=batch_number,
@@ -41,8 +40,8 @@ def detect_one_video(
         batch.append(image)
 
         if (len(batch) == batch_size) or (
-            (total_frames % batch_size == len(batch))
-            and (count == batch_number - 1)
+            (total_frames % batch_size == len(batch)) and (
+                count == batch_number - 1)
         ):
             bbx_batch["batch_" + str(count)] = detect_image_batch(
                 model=model,

@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torchvision.models.resnet import resnet50
 
-from config.config import Configs
+from detection.config.config import Configs
 
 
 class ResNet(nn.Module):
@@ -83,7 +83,8 @@ class SSD300(nn.Module):
                     nn.Conv2d(input_size, channels, kernel_size=1, bias=False),
                     nn.BatchNorm2d(channels),
                     nn.ReLU(inplace=True),
-                    nn.Conv2d(channels, output_size, kernel_size=3, bias=False),
+                    nn.Conv2d(channels, output_size,
+                              kernel_size=3, bias=False),
                     nn.BatchNorm2d(output_size),
                     nn.ReLU(inplace=True),
                 )
@@ -110,7 +111,8 @@ class SSD300(nn.Module):
             )
 
         locs, confs = list(zip(*ret))
-        locs, confs = torch.cat(locs, 2).contiguous(), torch.cat(confs, 2).contiguous()
+        locs, confs = torch.cat(locs, 2).contiguous(
+        ), torch.cat(confs, 2).contiguous()
         return locs, confs
 
     def forward(self, x):

@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from config.config import Configs
-from ssd.create_model import nvidia_ssd
+from detection.config.config import Configs
+from detection.ssd.create_model import nvidia_ssd
 
 
 class Detection_model:

@@ -6,10 +6,10 @@ from PIL import Image
 from torchvision import transforms
 from tqdm import tqdm
 
-from config.config import Configs
-from ssd.dataloader import ImagesDataset
-from ssd.decode_results import Processing as processing
-from utils.utils import get_bboxes
+from detection.config.config import Configs
+from detection.ssd.dataloader import ImagesDataset
+from detection.ssd.decode_results import Processing as processing
+from detection.utils.utils import get_bboxes
 
 
 def detect_images_from_folder(
@@ -81,9 +81,8 @@ def detect_image_batch(
             # SquarePad(),
             transforms.Resize((300, 300)),
             transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-            ),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                                 0.229, 0.224, 0.225]),
         ]
     )
     if len(inputs) == 1:

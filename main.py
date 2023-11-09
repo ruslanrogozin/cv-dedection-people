@@ -2,10 +2,11 @@ from pathlib import Path
 
 import torch
 
-from detect_images import detect_images_from_folder
-from detect_video import detect_videos_from_folder
-from ssd.create_model import nvidia_ssd
-from utils.utils import draw_bboxes_and_save_image, draw_boxes_and_save_video
+from detection.detect_images import detect_images_from_folder
+from detection.detect_video import detect_videos_from_folder
+from detection.ssd.create_model import nvidia_ssd
+from detection.utils.utils import (draw_bboxes_and_save_image,
+                                   draw_boxes_and_save_video)
 
 
 def main():
@@ -15,7 +16,7 @@ def main():
     model = nvidia_ssd(
         pretrained_default=False,
         pretrainded_custom=True,
-        path=work_directory / "weight\\state best_model_at_adam2.pth",
+        path=work_directory / "weight\\state_best_model_at_adam2.pth",
         device="cuda",
         label_num=3,
     )

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import torch
 
-from config.config import Configs
+from detection.config.config import Configs
 
 
 def nvidia_ssd(
@@ -23,6 +23,8 @@ def nvidia_ssd(
 
     if isinstance(path, str):
         path = Path(path)
+
+    path.mkdir(parents=True, exist_ok=True)
 
     if pretrained_default or pretrainded_custom:
         if pretrained_default:

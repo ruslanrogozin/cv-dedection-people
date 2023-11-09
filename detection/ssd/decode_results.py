@@ -1,8 +1,7 @@
 import numpy as np
 
-from config.config import Configs
-
-from .utils_ssd300 import Encoder, dboxes300_coco
+from detection.config.config import Configs
+from detection.ssd.utils_ssd300 import Encoder, dboxes300_coco
 
 
 class Processing:

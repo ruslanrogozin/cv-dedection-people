@@ -2,7 +2,7 @@ import torch
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from tqdm.auto import tqdm
 
-from config.config import Configs
+from detection.config.config import Configs
 
 
 def model_evaluate(
@@ -26,7 +26,8 @@ def model_evaluate(
         for idx in range(ploc.shape[0]):
             true_dict = dict()
             preds_dict = dict()
-            htot, wtot = images_sizes[0][idx].item(), images_sizes[1][idx].item()
+            htot, wtot = images_sizes[0][idx].item(
+            ), images_sizes[1][idx].item()
 
             if use_pick_best:
                 best_score = (detections[idx][2] > threshold).detach().cpu()

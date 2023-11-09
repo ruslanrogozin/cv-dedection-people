@@ -4,8 +4,8 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
-from config.config import Configs
-from ssd.utils_ssd300 import Encoder, calc_iou_tensor
+from detection.config.config import Configs
+from detection.ssd.utils_ssd300 import Encoder, calc_iou_tensor
 
 
 class RandomHorizontalFlip(object):

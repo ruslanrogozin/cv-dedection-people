@@ -11,11 +11,12 @@ import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from PIL import Image
 
-from config.config import Configs
-from detect_images import detect_image_batch, detect_images_from_folder
-from detect_video import detect_one_video, detect_videos_from_folder
-from ssd.create_model import nvidia_ssd
-from ssd.Detection_model import Detection_model
+from detection.config.config import Configs
+from detection.detect_images import (detect_image_batch,
+                                     detect_images_from_folder)
+from detection.detect_video import detect_one_video, detect_videos_from_folder
+from detection.ssd.create_model import nvidia_ssd
+from detection.ssd.Detection_model import Detection_model
 
 model = Detection_model()
 

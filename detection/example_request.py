@@ -1,6 +1,7 @@
 import requests
 
-from utils.utils import draw_bboxes_and_save_image, draw_boxes_and_save_video
+from detection.utils.utils import (draw_bboxes_and_save_image,
+                                   draw_boxes_and_save_video)
 
 BASE_URL = "http://127.0.0.1:8000"
 
