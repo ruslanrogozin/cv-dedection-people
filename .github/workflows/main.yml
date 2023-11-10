@@ -2,9 +2,9 @@ name:  Deploy Docker image
 
 on:
   push:
-    branches: [ main ssd300_video]
+    branches: [ ssd300_video]
   pull_request:
-    branches: [ main ssd300_video]
+    branches: [ ssd300_video]
 
 jobs:
   docker:
