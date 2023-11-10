@@ -1,4 +1,4 @@
-name: Docker Image CI
+name:  Deploy Docker image
 
 on:
   push:
@@ -7,7 +7,19 @@ on:
     branches: [ main ssd300_video]
 
 jobs:
-
-    build:
-      
+    build_container:
         runs-on: ubuntu-latest
+
+        steps:
+
+            - name: Checkout Code
+              uses: actions/checkout@v1
+
+            - name: Build and Push Docker Image
+              uses: mr-smithers-excellent/docker-build-push@v2
+              with:
+                image: ruslan1511/detection_people
+                registry: docker.io
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+
